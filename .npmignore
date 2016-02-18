@@ -1,0 +1,5 @@
+# If this file is not present the contents of .gitignore is used
+build/
+test/
+run-karma.sh
+.gitignore

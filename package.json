@@ -1,0 +1,34 @@
+{
+  "name": "chunked-request",
+  "version": "0.0.1",
+  "main": "lib/index.js",
+  "jsnext:main": "src/index.js",
+  "repository": "https://github.com/jonnyreeves/chunked-request",
+  "license": "MIT",
+  "scripts": {
+    "prepublish": "npm run clean && npm run build:lib",
+    "clean": "rm -rf build/*",
+    "build:integ": "mkdir -p build && browserify test/integ/*.spec.js -o build/integration-tests.js --debug -t [ babelify ]",
+    "build:lib": "mkdir -p lib && babel --out-dir lib src",
+    "lint": "eslint .",
+    "test": "npm run test:integ",
+    "test:integ": "npm run build:integ && ./run-karma.sh --single-run",
+    "watch:integ:build": "watchify test/integ/*.spec.js -o build/integration-tests.js --debug -t [ babelify ] -v &",
+    "watch:integ": "npm run watch:integ:build && ./run-karma.sh"
+  },
+  "devDependencies": {
+    "babel-cli": "^6.5.1",
+    "babel-preset-es2015": "^6.5.0",
+    "babelify": "^7.2.0",
+    "browserify": "^13.0.0",
+    "eslint": "^2.1.0",
+    "jasmine": "^2.4.1",
+    "jasmine-core": "^2.4.1",
+    "karma": "^0.13.21",
+    "karma-chrome-launcher": "^0.2.2",
+    "karma-jasmine": "^0.3.7",
+    "lodash": "^4.5.0",
+    "url": "^0.11.0",
+    "watchify": "^3.7.0"
+  }
+}

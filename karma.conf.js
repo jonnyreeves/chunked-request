@@ -1,8 +1,52 @@
 // Karma configuration
 // Generated on Wed Feb 17 2016 15:48:21 GMT+0000 (GMT)
 
-/*eslint-env node */
+/*eslint-env node*/
+/*eslint no-var: 0*/
 module.exports = function(config) {
+
+  // Browsers to run on Sauce Labs
+  // Check out https://saucelabs.com/platforms for all browser/OS combos
+  var customLaunchers = {
+    /*
+    // Currently disabled as chunked-transfer responses appear to fail on *all*
+    // SauceLabs MacOS platforms?
+    'SL_Safari': {
+      base: 'SauceLabs',
+      browserName: 'safari',
+      platform: 'OS X 10.11'
+    },
+    */
+    'SL_Chrome': {
+      base: 'SauceLabs',
+      browserName: 'chrome',
+      platform: 'linux'
+    },
+    'SL_Firefox': {
+      base: 'SauceLabs',
+      browserName: 'firefox',
+      platform: 'linux'
+    },
+    'SL_IE10': {
+      base: 'SauceLabs',
+      browserName: 'internet explorer',
+      platform: 'Windows 7',
+      version: '10'
+    }
+  };
+
+  var reporters = [];
+  var browsers = [];
+  var singlerun = false;
+  var concurrency = Infinity;
+
+  if (process.env.SAUCE_USERNAME) {
+    reporters.push('saucelabs');
+    Array.prototype.push.apply(browsers, Object.keys(customLaunchers));
+    singlerun = true;
+    concurrency = 1;
+  }
+
   config.set({
 
     // base path that will be used to resolve all patterns (eg. files, exclude)
@@ -13,6 +57,14 @@ module.exports = function(config) {
     // available frameworks: https://npmjs.org/browse/keyword/karma-adapter
     frameworks: ['jasmine'],
 
+    sauceLabs: {
+      recordScreenshots: false,
+      connectOptions: {
+        port: 5757,
+        logfile: 'sauce_connect.log'
+      },
+      public: 'public'
+    },
 
     // list of files / patterns to load in the browser
     files: [
@@ -40,7 +92,7 @@ module.exports = function(config) {
     // test results reporter to use
     // possible values: 'dots', 'progress'
     // available reporters: https://npmjs.org/browse/keyword/karma-reporter
-    reporters: ['progress'],
+    reporters: reporters,
 
 
     // web server port
@@ -60,17 +112,16 @@ module.exports = function(config) {
     autoWatch: true,
 
 
-    // start these browsers
-    // available browser launchers: https://npmjs.org/browse/keyword/karma-launcher
-    browsers: ['Chrome'],
-
+    browsers: browsers,
+    captureTimeout: 120000,
+    customLaunchers: customLaunchers,
 
     // Continuous Integration mode
     // if true, Karma captures browsers, runs the tests and exits
-    singleRun: false,
+    singleRun: singlerun,
 
     // Concurrency level
     // how many browser should be started simultaneous
-    concurrency: Infinity
+    concurrency: concurrency
   })
 };

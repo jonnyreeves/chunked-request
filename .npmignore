@@ -3,3 +3,4 @@ build/
 test/
 run-karma.sh
 .gitignore
+sauce_connect.log

@@ -11,10 +11,8 @@
     "build:integ": "mkdir -p build && browserify test/integ/*.spec.js -o build/integration-tests.js --debug -t [ babelify ]",
     "build:lib": "mkdir -p lib && babel --out-dir lib src",
     "lint": "eslint .",
-    "test": "npm run test:integ",
-    "test:integ": "npm run build:integ && ./run-karma.sh --single-run",
-    "watch:integ:build": "watchify test/integ/*.spec.js -o build/integration-tests.js --debug -t [ babelify ] -v &",
-    "watch:integ": "npm run watch:integ:build && ./run-karma.sh"
+    "test": "npm run lint && npm run test:integ",
+    "test:integ": "npm run build:integ && ./run-karma.sh --single-run"
   },
   "devDependencies": {
     "babel-cli": "^6.5.1",
@@ -27,8 +25,8 @@
     "karma": "^0.13.21",
     "karma-chrome-launcher": "^0.2.2",
     "karma-jasmine": "^0.3.7",
+    "karma-sauce-launcher": "^0.3.0",
     "lodash": "^4.5.0",
-    "url": "^0.11.0",
-    "watchify": "^3.7.0"
+    "url": "^0.11.0"
   }
 }

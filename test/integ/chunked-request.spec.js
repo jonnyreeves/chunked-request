@@ -33,21 +33,24 @@ describe('chunked-request', () => {
     const onComplete = () => {
       const chunkErrors = receivedChunks.filter(v => v instanceof Error);
 
-      expect(receivedChunks.length).toBe(2, 'receivedChunks');
+      expect(receivedChunks.length).toBe(3, 'receivedChunks');
       expect(chunkErrors.length).toBe(0, 'of which errors');
       expect(isEqual(receivedChunks, [
         [ {chunk: '#1', data: '#0'} ],
-        [ {chunk: '#2', data: '#0'} ]
+        [ {chunk: '#2', data: '#0'} ],
+        [ {chunk: '#3', data: '#0'} ]
       ])).toBe(true, 'parsed chunks');
 
       done();
     };
 
     chunkedRequest({
-      url: `/chunked-response?numChunks=2&entriesPerChunk=1`,
-      onChunk: (err, chunk) => receivedChunks.push(err || chunk),
+      url: `/chunked-response?numChunks=3&entriesPerChunk=1`,
+      onChunk: (err, chunk) => {
+        receivedChunks.push(err || chunk)
+      },
       onComplete
-    })
+    });
   });
 
   describe('response object', () => {

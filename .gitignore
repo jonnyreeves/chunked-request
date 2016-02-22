@@ -3,3 +3,4 @@ lib/
 build/
 .idea/
 npm-debug*
+sauce_connect.log

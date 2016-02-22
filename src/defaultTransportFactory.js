@@ -2,9 +2,9 @@ import fetchRequest from './impl/fetch';
 import mozXhrRequest from './impl/mozXhr';
 import xhrRequest from './impl/xhr';
 
-let selected = '';
+let selected = null;
 
-export function detectOptimalTransport() {
+export default function defaultTransportFactory() {
   if (!selected) {
     if (typeof window.ReadableByteStream === 'function') {
       selected = fetchRequest;

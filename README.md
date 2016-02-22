@@ -51,4 +51,4 @@ A function which will be invoked once when the browser has closed the connection
 Note that the `onChunk` option should be used to process the incoming response body.
 
 #### transport (optional)
-The underlying function to use to make the request, see the provided implementations if you wish to provide a custom extension. If no value is supplied an environment check will infer the best option for the user's browser.  Note that the `fetch` transport requires the underlying implementation to support `ReadableByteStream` and is incompatible with polyfills.
+The underlying function to use to make the request, see the provided implementations if you wish to provide a custom extension. If no value is supplied the `chunkedRequest.transportFactory` function will be invoked to determine which transport method to use.  The deafult `transportFactory` will attempt to select the best available method for the current platform; but you can override this method for substituting a test-double or custom implementation.

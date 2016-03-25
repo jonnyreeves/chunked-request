@@ -53,6 +53,52 @@ describe('chunked-request', () => {
     });
   });
 
+  it('should handle incomplete JSON chunks in the response', done => {
+    const receivedChunks = [];
+
+    const onComplete = () => {
+      const chunkErrors = receivedChunks.filter(v => v instanceof Error);
+
+      expect(receivedChunks.length).toBe(2, 'receivedChunks');
+      expect(chunkErrors.length).toBe(0, 'of which errors');
+      expect(isEqual(receivedChunks, [
+        [ {chunk: '#1', data: '#0'} ],
+        [ {chunk: '#1', data: '#1'}, {chunk: '#2', data: '#0'} ]
+      ])).toBe(true, 'parsed chunks');
+
+      done();
+    };
+
+    chunkedRequest({
+      url: `/split-chunked-response`,
+      onChunk: (err, chunk) => {
+        receivedChunks.push(err || chunk)
+      },
+      onComplete
+    });
+  });
+
+  it('should catch errors raised by the chunkParser and pass them to the `onChunk` callback', () => {
+    const receivedChunks = [];
+    const onComplete = () => {
+      const chunkErrors = receivedChunks.filter(v => v instanceof Error);
+      expect(chunkErrors.length).toBe(1, 'one error caught');
+      expect(chunkErrors[0].message).toBe('expected');
+      expect(chunkErrors[0].rawChunk).toBe(`{ "chunk": "#1", "data": "#0" }\n\n`);
+    };
+
+    chunkedRequest({
+      url: `/chunked-response?numChunks=1&entriesPerChunk=1`,
+      chunkParser: () => {
+        throw new Error("expected");
+      },
+      onChunk: (err, chunk) => {
+        receivedChunks.push(err || chunk)
+      },
+      onComplete
+    });
+  });
+
   describe('response object', () => {
     it('200 OK`', done => {
       chunkedRequest({

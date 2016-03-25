@@ -36,12 +36,34 @@ A hash of HTTP headers to sent with the request.
 The value to send along with the request.
 
 #### chunkParser (optional) 
-A function which takes the raw, textual chunk response returned by the server and converts it into the value passed to the `onChunk` callback (see `options.onChunk`).  If this value throws an exception, the chunk will be discarded and the error will be passed to the `onChunk` callback.  If no `chunkParser` is supplied the `defaultChunkParser` will be used which expects the chunks returned by the server to consist of one or more lines of JSON object literals which are parsed into an Array or objects. 
+A function which implements the following interface:
+
+```js
+(rawChunk, previousChunkSuffix) => [ parsedChunk, chunkSuffix ]
+```
+
+The `chunkParser` takes the raw, textual chunk response returned by the server and converts it into the value passed to the `onChunk` callback (see `options.onChunk`).  The function may also yield an optional chunkSuffix which will be not be passed to the `onChunk` callback but will instead be supplied as the `previousChunkSuffix` value the next time the `chunkParser` is invoked.
+
+If the `chunkParser` throws an exception, the chunk will be discarded and the error that was raised will be passed to the `onChunk` callback augmented with a `rawChunk` property consisting of the textual chunk for logging / recovery.
+
+If no `chunkParser` is supplied the `defaultChunkParser` will be used which expects the chunks returned by the server to consist of one or more `\n` delimited lines of JSON object literals which are parsed into an Array.
 
 #### onChunk (optional)
-A function which will be invoked each time a chunk of data it returned by the server. This function will be invoked one or more times depending on the response.  The function is invoked with two arguments; the first is an optional error which will be null unless there was a parsing error.  The second argument is an optional parsedChunk value which is produced by the supplied `chunkParser` (see: `options.chunkParser`).
+A function which implements the following interface:
+
+```js
+(err, parsedChunk) => undefined
+```
+
+The `onChunk` handler will be invoked each time a chunk of data it returned by the server. This function will be invoked one or more times depending on the response.  The function is invoked with two arguments; the first is an optional error which will be null unless there was a parsing error thrown by the `chunkParser``.  The second argument is an optional parsedChunk value which is produced by the supplied `chunkParser` (see: `options.chunkParser`).
 
 #### onComplete (optional)
+A function which implements the following interface:
+
+```js
+({ statusCode, transport, raw }) => undefined
+```
+
 A function which will be invoked once when the browser has closed the connection to the server. This function is invoked with a single argument which contains the following properties:
 
 * `statusCode` - HTTP status code returned by the underlying transport
@@ -51,4 +73,12 @@ A function which will be invoked once when the browser has closed the connection
 Note that the `onChunk` option should be used to process the incoming response body.
 
 #### transport (optional)
-The underlying function to use to make the request, see the provided implementations if you wish to provide a custom extension. If no value is supplied the `chunkedRequest.transportFactory` function will be invoked to determine which transport method to use.  The deafult `transportFactory` will attempt to select the best available method for the current platform; but you can override this method for substituting a test-double or custom implementation.
+A function which implements the following interface:
+
+```js
+({ url, headers, method, body, onComplete, onRawChunk }) => undefined
+```
+
+The underlying function to use to make the request, see the provided implementations if you wish to provide a custom extension.
+
+If no value is supplied the `chunkedRequest.transportFactory` function will be invoked to determine which transport method to use.  The deafult `transportFactory` will attempt to select the best available method for the current platform; but you can override this method for substituting a test-double or custom implementation.

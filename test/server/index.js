@@ -34,9 +34,26 @@ function serveEchoResponse(req, res) {
       headers: req.headers,
       method: req.method,
       body
-    }));
+    }) + "\n");
     res.end();
   });
+}
+
+function serveSplitChunkedResponse(req, res) {
+  res.setHeader('Content-Type', 'text/html; charset=UTF-8');
+  res.setHeader('Transfer-Encoding', 'chunked');
+
+  let firstChunk = formatChunk(1, 2);
+  let secondChunk = formatChunk(2, 1);
+
+  secondChunk = firstChunk.substr(firstChunk.length - 5) + secondChunk;
+  firstChunk = firstChunk.substr(0, firstChunk.length - 5);
+
+  res.write(firstChunk);
+  setTimeout(function () {
+    res.write(secondChunk);
+    res.end();
+  }, 100);
 }
 
 function serveChunkedResponse(req, res) {
@@ -80,6 +97,8 @@ function handler(req, res) {
   switch (req.parsedUrl.pathname) {
   case '/chunked-response':
     return serveChunkedResponse(req, res);
+  case '/split-chunked-response':
+    return serveSplitChunkedResponse(req, res);
   case '/echo-response':
     return serveEchoResponse(req, res);
   case '/error-response':

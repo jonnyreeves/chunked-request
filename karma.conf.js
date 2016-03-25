@@ -35,7 +35,7 @@ module.exports = function(config) {
     }
   };
 
-  var reporters = [];
+  var reporters = ['dots'];
   var browsers = [];
   var singlerun = false;
   var concurrency = Infinity;

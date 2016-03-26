@@ -7,6 +7,15 @@ At the time of writing (Feb 2016) there is fragmented support for efficient chun
 
 This library aims to smooth over the available implementations and provide a consistent API for dealing with cross-browser support.
 
+## Installation
+via npm as an ES5/ES6 module:
+
+```bash
+$ npm install chunked-request
+```
+
+or as a standalone ES5 browser script by obtaining `dist/chunked-request.js` from a [tagged release](https://github.com/jonnyreeves/chunked-request/releases).
+
 ## API
 
 ```js

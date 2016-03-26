@@ -1,3 +1,7 @@
+## [0.2.1] - 26/03/2016
+### Added
+- Standalone browser artifact (fixes #4)
+
 ## [0.2.0] - 26/03/2016
 ### Added
 - Support for partial chunk parsing where the chunk does not end with the delimiter

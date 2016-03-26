@@ -19,14 +19,20 @@ export default function chunkedRequest(options) {
     chunkParser = defaultChunkParser
   } = options;
 
+  let prevChunkSuffix = "";
+
   function processRawChunk(rawChunk) {
     let parsedChunks = null;
     let parseError = null;
+    let suffix = "";
 
     try {
-      parsedChunks = chunkParser(rawChunk);
+      [ parsedChunks, suffix ] = chunkParser(rawChunk, prevChunkSuffix);
+      prevChunkSuffix = suffix || "";
     } catch (e) {
       parseError = e;
+      parseError.rawChunk = rawChunk;
+      parseError.prevChunkSuffix = prevChunkSuffix;
     } finally {
       onChunk(parseError, parsedChunks);
     }

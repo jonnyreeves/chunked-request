@@ -6,6 +6,11 @@ const url = require('url');
 // Which port should HTTP traffic be served over?
 const httpPort = process.env.HTTP_PORT || 2001;
 
+// How frequently should chunks be written to the response?  Note that we have no
+// control over when chunks are actually emitted to the client so it's best to keep
+// this value high and pray to the gods of TCP.
+const chunkIntervalMs = 1000;
+
 function formatChunk(chunkNumber, numEntries) {
   let data = '';
   for (let i = 0; i < numEntries; i++) {
@@ -34,16 +39,32 @@ function serveEchoResponse(req, res) {
       headers: req.headers,
       method: req.method,
       body
-    }));
+    }) + "\n");
     res.end();
   });
+}
+
+function serveSplitChunkedResponse(req, res) {
+  res.setHeader('Content-Type', 'text/html; charset=UTF-8');
+  res.setHeader('Transfer-Encoding', 'chunked');
+
+  let firstChunk = formatChunk(1, 2);
+  let secondChunk = formatChunk(2, 1);
+
+  secondChunk = firstChunk.substr(firstChunk.length - 5) + secondChunk;
+  firstChunk = firstChunk.substr(0, firstChunk.length - 5);
+
+  res.write(firstChunk);
+  setTimeout(function () {
+    res.write(secondChunk);
+    res.end();
+  }, chunkIntervalMs);
 }
 
 function serveChunkedResponse(req, res) {
   const query = url.parse(req.url, true).query;
   const numChunks = parseInt(query.numChunks, 10) || 4;
   const entriesPerChunk = parseInt(query.entriesPerChunk, 10) || 2;
-  const intervalMs = parseInt(query.intervalMs, 10) || 100;
 
   res.setHeader('Content-Type', 'text/html; charset=UTF-8');
   res.setHeader('Transfer-Encoding', 'chunked');
@@ -65,7 +86,7 @@ function serveChunkedResponse(req, res) {
       clearInterval(chunkIntervalId);
       res.end();
     }
-  }, intervalMs);
+  }, chunkIntervalMs);
 }
 
 function serveErrorResponse(req, res) {
@@ -80,6 +101,8 @@ function handler(req, res) {
   switch (req.parsedUrl.pathname) {
   case '/chunked-response':
     return serveChunkedResponse(req, res);
+  case '/split-chunked-response':
+    return serveSplitChunkedResponse(req, res);
   case '/echo-response':
     return serveEchoResponse(req, res);
   case '/error-response':

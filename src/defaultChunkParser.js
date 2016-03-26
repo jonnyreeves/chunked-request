@@ -8,16 +8,23 @@ const entryDelimiter = '\n';
 //
 // It will correctly handle the case where a chunk is emitted by the server across
 // delimiter boundaries.
-export default function defaultChunkParser(rawChunk, prevChunkSuffix) {
+export default function defaultChunkParser(rawChunk, prevChunkSuffix = '') {
   let chunkSuffix;
 
   const rawChunks = `${prevChunkSuffix}${rawChunk}`
-      .split(entryDelimiter)
-      .filter(v => !!v.trim());
+    .split(entryDelimiter);
 
-  if (!rawChunk.endsWith(entryDelimiter)) {
+  if (!hasSuffix(rawChunk, entryDelimiter)) {
     chunkSuffix = rawChunks.pop();
   }
 
-  return [ rawChunks.map(v => JSON.parse(v)), chunkSuffix ];
+  const processedChunks = rawChunks
+    .filter(v => v.trim() !== '')
+    .map(v => JSON.parse(v));
+
+  return [ processedChunks, chunkSuffix ];
+}
+
+function hasSuffix(s, suffix) {
+  return s.substr(s.length - suffix.length) === suffix;
 }

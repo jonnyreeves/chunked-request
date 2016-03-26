@@ -12,7 +12,8 @@
     "build:lib": "mkdir -p lib && babel --out-dir lib src",
     "lint": "eslint .",
     "test": "npm run lint && npm run test:integ",
-    "test:integ": "npm run build:integ && ./run-karma.sh --single-run"
+    "test:integ": "npm run build:integ && ./run-karma.sh --single-run",
+    "release": "./release.sh ${npm_package_version}"
   },
   "devDependencies": {
     "babel-cli": "^6.6.5",

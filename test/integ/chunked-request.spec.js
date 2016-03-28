@@ -149,7 +149,48 @@ describe('chunked-request', () => {
 
           done();
         }
-      })
-    })
+      });
+    });
+
+    describe("credentials", () => {
+      const cookieNames = [];
+
+      function setCookie(name, value) {
+        document.cookie = `${name}=${value}`;
+        cookieNames.push(name);
+      }
+
+      function clearSetCookies() {
+        cookieNames.forEach(name => {
+          document.cookie = `${name}=false;max-age=0`;
+        })
+      }
+
+      afterEach(clearSetCookies);
+
+      it('should honour the `credentials` flag', done => {
+        const receivedChunks = [];
+
+        setCookie('myCookie', 'myValue');
+
+        chunkedRequest({
+          url: `/echo-response`,
+          method: 'GET',
+          onChunk: (err, chunk) => receivedChunks.push(err || chunk),
+          onComplete: () => {
+            const chunkErrors = receivedChunks.filter(v => v instanceof Error);
+
+            expect(receivedChunks.length).toBe(1, 'one chunk');
+            expect(chunkErrors.length).toBe(0, 'no errors');
+
+            const { cookies } = receivedChunks[0][0];
+            expect(isObject(cookies)).toBe(true, 'has cookies');
+            expect(cookies.myCookie).toEqual('myValue', 'cookie sent');
+
+            done();
+          }
+        });
+      });
+    });
   });
 });

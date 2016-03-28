@@ -2,6 +2,7 @@
 
 const http = require('http');
 const url = require('url');
+const cookieParser = require('cookie');
 
 // Which port should HTTP traffic be served over?
 const httpPort = process.env.HTTP_PORT || 2001;
@@ -38,6 +39,7 @@ function serveEchoResponse(req, res) {
     res.write(JSON.stringify({
       headers: req.headers,
       method: req.method,
+      cookies: cookieParser.parse(req.headers.cookie || ''),
       body
     }) + "\n");
     res.end();

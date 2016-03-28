@@ -29,6 +29,9 @@ export default function mozXhrRequest(options) {
       xhr.setRequestHeader(k, options.headers[k]);
     })
   }
+  if (options.credentials === 'include') {
+    xhr.withCredentials = true;
+  }
   xhr.addEventListener('progress', onProgressEvent);
   xhr.addEventListener('load', onLoadEvent);
   xhr.send(options.body);

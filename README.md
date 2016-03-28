@@ -26,6 +26,7 @@ chunkedRequest({
   method: 'POST',
   headers: { /*...*/ },
   body: JSON.stringify({ /*...*/ }),
+  credentials: 'include',
   chunkParser(rawChunk) { /*...*/ },
   onChunk(err, parsedChunk) { /*...*/ },
   onComplete(result) { /*...*/ }
@@ -43,6 +44,9 @@ A hash of HTTP headers to sent with the request.
 
 #### body (optional)
 The value to send along with the request.
+
+#### credentials (optional)
+Determine if HTTP cookies will be sent along with the request, one of `same-origin`, `include` or `omit` (mirroring the fetch API).  Defaults to `same-domain` for consistency between fetch and XHR based transport; note that a value of `omit` will not affect XHR based transports which will always send cookies with requests made against the same origin.
 
 #### chunkParser (optional) 
 A function which implements the following interface:
@@ -85,7 +89,7 @@ Note that the `onChunk` option should be used to process the incoming response b
 A function which implements the following interface:
 
 ```js
-({ url, headers, method, body, onComplete, onRawChunk }) => undefined
+({ url, headers, method, body, credentials, onComplete, onRawChunk }) => undefined
 ```
 
 The underlying function to use to make the request, see the provided implementations if you wish to provide a custom extension.

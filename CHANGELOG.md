@@ -1,4 +1,4 @@
-## unreleased
+## [0.3.1] - 30/03/2016
 ### Added
 - npm keywords
 

@@ -1,6 +1,6 @@
 {
   "name": "chunked-request",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "main": "lib/index.js",
   "jsnext:main": "src/index.js",
   "repository": "https://github.com/jonnyreeves/chunked-request",

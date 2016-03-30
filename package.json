@@ -5,6 +5,7 @@
   "jsnext:main": "src/index.js",
   "repository": "https://github.com/jonnyreeves/chunked-request",
   "license": "MIT",
+  "keywords": [ "request", "chunked", "transfer", "comet", "xhr", "fetch" ],
   "scripts": {
     "prepublish": "npm run clean && npm run build:lib",
     "clean": "rm -rf build/*",

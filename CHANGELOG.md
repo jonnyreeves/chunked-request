@@ -1,3 +1,7 @@
+## unreleased
+### Added
+- npm keywords
+
 ## [0.3.0] - 30/03/2016
 ### Added
 - `credentials` support, defaults to `'same-origin'` for consistency between XHR and fetch based transports. (#5, #6)

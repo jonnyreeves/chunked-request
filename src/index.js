@@ -14,6 +14,7 @@ export default function chunkedRequest(options) {
     headers,
     method = 'GET',
     body,
+    credentials = 'same-origin',
     onComplete = noop,
     onChunk = noop,
     chunkParser = defaultChunkParser
@@ -48,6 +49,7 @@ export default function chunkedRequest(options) {
     headers,
     method,
     body,
+    credentials,
     onComplete,
     onRawChunk: processRawChunk
   });

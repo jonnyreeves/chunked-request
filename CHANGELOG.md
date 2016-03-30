@@ -2,6 +2,10 @@
 ### Added
 - npm keywords
 
+### Fixed
+- Add `dist/` to `.eslintignore` to prevent build failures on release branches
+- Exclude dot files and other dev related junk from npm package.
+
 ## [0.3.0] - 30/03/2016
 ### Added
 - `credentials` support, defaults to `'same-origin'` for consistency between XHR and fetch based transports. (#5, #6)

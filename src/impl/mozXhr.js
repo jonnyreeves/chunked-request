@@ -34,5 +34,6 @@ export default function mozXhrRequest(options) {
   }
   xhr.addEventListener('progress', onProgressEvent);
   xhr.addEventListener('loadend', onLoadEvent);
+  xhr.addEventListener('error', options.onError);
   xhr.send(options.body);
 }

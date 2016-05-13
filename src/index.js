@@ -17,6 +17,7 @@ export default function chunkedRequest(options) {
     credentials = 'same-origin',
     onComplete = noop,
     onChunk = noop,
+    onError = noop,
     chunkParser = defaultChunkParser
   } = options;
 
@@ -61,7 +62,8 @@ export default function chunkedRequest(options) {
     body,
     credentials,
     onRawChunk: processRawChunk,
-    onRawComplete: processRawComplete
+    onRawComplete: processRawComplete,
+    onError
   });
 }
 
@@ -77,5 +79,6 @@ function validateOptions(o) {
   // Optional.
   if (o.onComplete && typeof o.onComplete !== 'function') throw new Error('Invalid options.onComplete value');
   if (o.onChunk && typeof o.onChunk !== 'function') throw new Error('Invalid options.onChunk value');
+  if (o.onError && typeof o.onError !== 'function') throw new Error('Invalid options.onError value');
   if (o.chunkParser && typeof o.chunkParser !== 'function') throw new Error('Invalid options.chunkParser value');
 }

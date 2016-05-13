@@ -4,7 +4,7 @@ export const READABLE_BYTE_STREAM = 'readable-byte-stream';
 
 export default function fetchRequest(options) {
   const decoder = new TextDecoder();
-  const { onRawChunk, onRawComplete, method, body, credentials } = options;
+  const { onRawChunk, onRawComplete, onError, method, body, credentials } = options;
   const headers = marshallHeaders(options.headers);
 
   function pump(reader, res) {
@@ -23,7 +23,8 @@ export default function fetchRequest(options) {
   }
 
   fetch(options.url, { headers, method, body, credentials })
-    .then(res => pump(res.body.getReader(), res));
+    .then(res => pump(res.body.getReader(), res))
+    .catch(onError);
 }
 
 function marshallHeaders(v) {

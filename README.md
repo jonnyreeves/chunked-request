@@ -52,7 +52,7 @@ Determine if HTTP cookies will be sent along with the request, one of `same-orig
 A function which implements the following interface:
 
 ```js
-(rawChunk, previousChunkSuffix) => [ parsedChunk, chunkSuffix ]
+(rawChunk, previousChunkSuffix, isFinalChunk) => [ parsedChunk, chunkSuffix ]
 ```
 
 The `chunkParser` takes the raw, textual chunk response returned by the server and converts it into the value passed to the `onChunk` callback (see `options.onChunk`).  The function may also yield an optional chunkSuffix which will be not be passed to the `onChunk` callback but will instead be supplied as the `previousChunkSuffix` value the next time the `chunkParser` is invoked.
@@ -60,6 +60,8 @@ The `chunkParser` takes the raw, textual chunk response returned by the server a
 If the `chunkParser` throws an exception, the chunk will be discarded and the error that was raised will be passed to the `onChunk` callback augmented with a `rawChunk` property consisting of the textual chunk for logging / recovery.
 
 If no `chunkParser` is supplied the `defaultChunkParser` will be used which expects the chunks returned by the server to consist of one or more `\n` delimited lines of JSON object literals which are parsed into an Array.
+
+`chunkParser` will be called with `isFinalChunk` as `true` when the response has completed and there was a non-empty `chunkSuffix` from the last chunk. The `rawChunk` will be an empty string and the `previousChunkSuffix` will be the last returned `chunkSuffix`.
 
 #### onChunk (optional)
 A function which implements the following interface:

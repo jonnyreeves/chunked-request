@@ -11,7 +11,7 @@ export default function xhrRequest(options) {
   }
 
   function onLoadEvent() {
-    options.onComplete({
+    options.onRawComplete({
       statusCode: xhr.status,
       transport: XHR,
       raw: xhr

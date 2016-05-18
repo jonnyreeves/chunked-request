@@ -15,7 +15,7 @@ export default function mozXhrRequest(options) {
   }
 
   function onLoadEvent() {
-    options.onComplete({
+    options.onRawComplete({
       statusCode: xhr.status,
       transport: MOZ_CHUNKED,
       raw: xhr

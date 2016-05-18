@@ -12,12 +12,15 @@ const httpPort = process.env.HTTP_PORT || 2001;
 // this value high and pray to the gods of TCP.
 const chunkIntervalMs = 1000;
 
-function formatChunk(chunkNumber, numEntries) {
+function formatChunk(chunkNumber, numEntries, delimitLastMessage) {
   let data = '';
   for (let i = 0; i < numEntries; i++) {
-    data += '{ "chunk": "#' + chunkNumber + '", "data": "#' + i + '" }\n';
+    data += '{ "chunk": "#' + chunkNumber + '", "data": "#' + i + '" }';
+    if (delimitLastMessage || i < numEntries - 1) {
+      data += '\n';
+    }
   }
-  return data + '\n';
+  return data;
 }
 
 function readRequestBody(req, callback) {
@@ -50,8 +53,8 @@ function serveSplitChunkedResponse(req, res) {
   res.setHeader('Content-Type', 'text/html; charset=UTF-8');
   res.setHeader('Transfer-Encoding', 'chunked');
 
-  let firstChunk = formatChunk(1, 2);
-  let secondChunk = formatChunk(2, 1);
+  let firstChunk = formatChunk(1, 2, true);
+  let secondChunk = formatChunk(2, 2, false);
 
   secondChunk = firstChunk.substr(firstChunk.length - 5) + secondChunk;
   firstChunk = firstChunk.substr(0, firstChunk.length - 5);
@@ -67,13 +70,14 @@ function serveChunkedResponse(req, res) {
   const query = url.parse(req.url, true).query;
   const numChunks = parseInt(query.numChunks, 10) || 4;
   const entriesPerChunk = parseInt(query.entriesPerChunk, 10) || 2;
+  const delimitLast = Boolean(query.delimitLast);
 
   res.setHeader('Content-Type', 'text/html; charset=UTF-8');
   res.setHeader('Transfer-Encoding', 'chunked');
 
   // Start at 1 as we serve the first chunk immediately.
   let i = 1;
-  res.write(formatChunk(i, entriesPerChunk));
+  res.write(formatChunk(i, entriesPerChunk, true));
 
   // Only serving a single chunk?  We're done.
   if (numChunks === 1) {
@@ -83,7 +87,8 @@ function serveChunkedResponse(req, res) {
   // Let the chunks begin!
   const chunkIntervalId = setInterval(function () {
     i++;
-    res.write(formatChunk(i, entriesPerChunk));
+    const delimitLastMessage = i!==numChunks || delimitLast;
+    res.write(formatChunk(i, entriesPerChunk, delimitLastMessage));
     if (i >= numChunks) {
       clearInterval(chunkIntervalId);
       res.end();

@@ -53,17 +53,44 @@ describe('chunked-request', () => {
     });
   });
 
+  it('should parse a response that consists of two chunks and ends with a delimiter', done => {
+    const receivedChunks = [];
+
+    const onComplete = () => {
+      const chunkErrors = receivedChunks.filter(v => v instanceof Error);
+
+      expect(receivedChunks.length).toBe(3, 'receivedChunks');
+      expect(chunkErrors.length).toBe(0, 'of which errors');
+      expect(isEqual(receivedChunks, [
+        [ {chunk: '#1', data: '#0'} ],
+        [ {chunk: '#2', data: '#0'} ],
+        [ {chunk: '#3', data: '#0'} ]
+      ])).toBe(true, 'parsed chunks');
+
+      done();
+    };
+
+    chunkedRequest({
+      url: `/chunked-response?numChunks=3&entriesPerChunk=1&delimitEnd=1`,
+      onChunk: (err, chunk) => {
+        receivedChunks.push(err || chunk)
+      },
+      onComplete
+    });
+  });
+
   it('should handle incomplete JSON chunks in the response', done => {
     const receivedChunks = [];
 
     const onComplete = () => {
       const chunkErrors = receivedChunks.filter(v => v instanceof Error);
 
-      expect(receivedChunks.length).toBe(2, 'receivedChunks');
+      expect(receivedChunks.length).toBe(3, 'receivedChunks');
       expect(chunkErrors.length).toBe(0, 'of which errors');
       expect(isEqual(receivedChunks, [
         [ {chunk: '#1', data: '#0'} ],
-        [ {chunk: '#1', data: '#1'}, {chunk: '#2', data: '#0'} ]
+        [ {chunk: '#1', data: '#1'}, {chunk: '#2', data: '#0'} ],
+        [ {chunk: '#2', data: '#1'} ]
       ])).toBe(true, 'parsed chunks');
 
       done();
@@ -78,13 +105,17 @@ describe('chunked-request', () => {
     });
   });
 
-  it('should catch errors raised by the chunkParser and pass them to the `onChunk` callback', () => {
+  it('should catch errors raised by the chunkParser and pass them to the `onChunk` callback', done => {
     const receivedChunks = [];
     const onComplete = () => {
       const chunkErrors = receivedChunks.filter(v => v instanceof Error);
-      expect(chunkErrors.length).toBe(1, 'one error caught');
+      expect(chunkErrors.length).toBe(2, 'two errors caught');
       expect(chunkErrors[0].message).toBe('expected');
-      expect(chunkErrors[0].rawChunk).toBe(`{ "chunk": "#1", "data": "#0" }\n\n`);
+      expect(chunkErrors[0].rawChunk).toBe(`{ "chunk": "#1", "data": "#0" }\n`);
+      expect(chunkErrors[1].message).toBe('expected');
+      expect(chunkErrors[1].rawChunk).toBe(``);
+
+      done();
     };
 
     chunkedRequest({

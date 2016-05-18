@@ -22,21 +22,31 @@ export default function chunkedRequest(options) {
 
   let prevChunkSuffix = "";
 
-  function processRawChunk(rawChunk) {
+  function processRawChunk(rawChunk, isFinalChunk = false) {
     let parsedChunks = null;
     let parseError = null;
     let suffix = "";
 
     try {
-      [ parsedChunks, suffix ] = chunkParser(rawChunk, prevChunkSuffix);
+      [ parsedChunks, suffix ] = chunkParser(rawChunk, prevChunkSuffix, isFinalChunk);
       prevChunkSuffix = suffix || "";
     } catch (e) {
       parseError = e;
       parseError.rawChunk = rawChunk;
       parseError.prevChunkSuffix = prevChunkSuffix;
     } finally {
-      onChunk(parseError, parsedChunks);
+      if (parseError || (parsedChunks!=null && parsedChunks.length > 0) ) {
+        onChunk(parseError, parsedChunks);
+      }
     }
+  }
+
+  function processRawComplete(rawComplete) {
+    if( prevChunkSuffix != "") {
+      // Call the parser with isFinalChunk=true to flush the prevChunkSuffix
+      processRawChunk("", true);
+    }
+    onComplete(rawComplete);
   }
 
   let transport = options.transport;
@@ -50,8 +60,8 @@ export default function chunkedRequest(options) {
     method,
     body,
     credentials,
-    onComplete,
-    onRawChunk: processRawChunk
+    onRawChunk: processRawChunk,
+    onRawComplete: processRawComplete
   });
 }
 

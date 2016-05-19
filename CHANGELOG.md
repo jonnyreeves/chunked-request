@@ -1,3 +1,8 @@
+## [0.4.0] - 19/05/2016
+### Added
+- Support responses that do not end with a trailing delimiter (#9, @MarcusLongmuir)
+- Switched to `loadend` event to catch failures as well as success on XHR based transports.
+
 ## [0.3.1] - 30/03/2016
 ### Added
 - npm keywords

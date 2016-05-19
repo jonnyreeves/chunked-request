@@ -29,7 +29,8 @@ chunkedRequest({
   credentials: 'include',
   chunkParser(rawChunk) { /*...*/ },
   onChunk(err, parsedChunk) { /*...*/ },
-  onComplete(result) { /*...*/ }
+  onComplete(result) { /*...*/ },
+  onError(err) { /*...*/ }
 });
 ```
 
@@ -87,13 +88,22 @@ A function which will be invoked once when the browser has closed the connection
 
 Note that the `onChunk` option should be used to process the incoming response body.
 
+#### onError (optional)
+A function which implements the following interface:
+
+```js
+(error) => undefined
+```
+
+A function which will be invoked when the server cannot be reached. Reason might be the server is down or the host is unknown. This function is invoked with a single argument containing the error.
+
 #### transport (optional)
 A function which implements the following interface:
 
 ```js
-({ url, headers, method, body, credentials, onComplete, onRawChunk }) => undefined
+({ url, headers, method, body, credentials, onComplete, onRawChunk, onError }) => undefined
 ```
 
 The underlying function to use to make the request, see the provided implementations if you wish to provide a custom extension.
 
-If no value is supplied the `chunkedRequest.transportFactory` function will be invoked to determine which transport method to use.  The deafult `transportFactory` will attempt to select the best available method for the current platform; but you can override this method for substituting a test-double or custom implementation.
+If no value is supplied the `chunkedRequest.transportFactory` function will be invoked to determine which transport method to use.  The default `transportFactory` will attempt to select the best available method for the current platform; but you can override this method for substituting a test-double or custom implementation.

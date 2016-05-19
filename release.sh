@@ -2,7 +2,7 @@
 set -e
 
 VERSION=${1}
-if [ -z ${VERSION+x} ]; then
+if [ -z ${VERSION} ]; then
   echo "VERSION not set"
   exit 1
 fi

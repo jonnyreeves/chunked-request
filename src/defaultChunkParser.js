@@ -8,13 +8,13 @@ const entryDelimiter = '\n';
 //
 // It will correctly handle the case where a chunk is emitted by the server across
 // delimiter boundaries.
-export default function defaultChunkParser(rawChunk, prevChunkSuffix = '') {
+export default function defaultChunkParser(rawChunk, prevChunkSuffix = '', isFinalChunk = false) {
   let chunkSuffix;
 
   const rawChunks = `${prevChunkSuffix}${rawChunk}`
     .split(entryDelimiter);
 
-  if (!hasSuffix(rawChunk, entryDelimiter)) {
+  if (!isFinalChunk && !hasSuffix(rawChunk, entryDelimiter)) {
     chunkSuffix = rawChunks.pop();
   }
 

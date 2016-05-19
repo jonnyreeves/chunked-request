@@ -11,7 +11,7 @@ export default function xhrRequest(options) {
   }
 
   function onLoadEvent() {
-    options.onComplete({
+    options.onRawComplete({
       statusCode: xhr.status,
       transport: XHR,
       raw: xhr
@@ -29,6 +29,6 @@ export default function xhrRequest(options) {
     xhr.withCredentials = true;
   }
   xhr.addEventListener('progress', onProgressEvent);
-  xhr.addEventListener('load', onLoadEvent);
+  xhr.addEventListener('loadend', onLoadEvent);
   xhr.send(options.body);
 }

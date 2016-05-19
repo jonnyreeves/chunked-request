@@ -29,6 +29,6 @@ export default function xhrRequest(options) {
     xhr.withCredentials = true;
   }
   xhr.addEventListener('progress', onProgressEvent);
-  xhr.addEventListener('load', onLoadEvent);
+  xhr.addEventListener('loadend', onLoadEvent);
   xhr.send(options.body);
 }

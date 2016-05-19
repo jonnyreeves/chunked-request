@@ -33,6 +33,6 @@ export default function mozXhrRequest(options) {
     xhr.withCredentials = true;
   }
   xhr.addEventListener('progress', onProgressEvent);
-  xhr.addEventListener('load', onLoadEvent);
+  xhr.addEventListener('loadend', onLoadEvent);
   xhr.send(options.body);
 }

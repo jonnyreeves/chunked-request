@@ -70,14 +70,14 @@ function serveChunkedResponse(req, res) {
   const query = url.parse(req.url, true).query;
   const numChunks = parseInt(query.numChunks, 10) || 4;
   const entriesPerChunk = parseInt(query.entriesPerChunk, 10) || 2;
-  const delimitLast = Boolean(query.delimitLast);
+  const delimitLast = parseInt(query.delimitLast, 10)===1;
 
   res.setHeader('Content-Type', 'text/html; charset=UTF-8');
   res.setHeader('Transfer-Encoding', 'chunked');
 
   // Start at 1 as we serve the first chunk immediately.
   let i = 1;
-  res.write(formatChunk(i, entriesPerChunk, true));
+  res.write(formatChunk(i, entriesPerChunk, numChunks!==1 || delimitLast));
 
   // Only serving a single chunk?  We're done.
   if (numChunks === 1) {

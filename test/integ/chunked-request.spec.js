@@ -21,36 +21,10 @@ describe('chunked-request', () => {
     };
 
     chunkedRequest({
-      url: `/chunked-response?numChunks=1&entriesPerChunk=1`,
+      url: `/chunked-response?numChunks=1&entriesPerChunk=1&delimitLast=1`,
       onChunk: (err, chunk) => receivedChunks.push(err || chunk),
       onComplete
     })
-  });
-
-  it('should parse a response that consists of two chunks', done => {
-    const receivedChunks = [];
-
-    const onComplete = () => {
-      const chunkErrors = receivedChunks.filter(v => v instanceof Error);
-
-      expect(receivedChunks.length).toBe(3, 'receivedChunks');
-      expect(chunkErrors.length).toBe(0, 'of which errors');
-      expect(isEqual(receivedChunks, [
-        [ {chunk: '#1', data: '#0'} ],
-        [ {chunk: '#2', data: '#0'} ],
-        [ {chunk: '#3', data: '#0'} ]
-      ])).toBe(true, 'parsed chunks');
-
-      done();
-    };
-
-    chunkedRequest({
-      url: `/chunked-response?numChunks=3&entriesPerChunk=1`,
-      onChunk: (err, chunk) => {
-        receivedChunks.push(err || chunk)
-      },
-      onComplete
-    });
   });
 
   it('should parse a response that consists of two chunks and ends with a delimiter', done => {
@@ -71,7 +45,33 @@ describe('chunked-request', () => {
     };
 
     chunkedRequest({
-      url: `/chunked-response?numChunks=3&entriesPerChunk=1&delimitEnd=1`,
+      url: `/chunked-response?numChunks=3&entriesPerChunk=1&delimitLast=1`,
+      onChunk: (err, chunk) => {
+        receivedChunks.push(err || chunk)
+      },
+      onComplete
+    });
+  });
+
+  it('should parse a response that consists of two chunks and does not end with a delimiter', done => {
+    const receivedChunks = [];
+
+    const onComplete = () => {
+      const chunkErrors = receivedChunks.filter(v => v instanceof Error);
+
+      expect(receivedChunks.length).toBe(3, 'receivedChunks');
+      expect(chunkErrors.length).toBe(0, 'of which errors');
+      expect(isEqual(receivedChunks, [
+        [ {chunk: '#1', data: '#0'} ],
+        [ {chunk: '#2', data: '#0'} ],
+        [ {chunk: '#3', data: '#0'} ]
+      ])).toBe(true, 'parsed chunks');
+
+      done();
+    };
+
+    chunkedRequest({
+      url: `/chunked-response?numChunks=3&entriesPerChunk=1&delimitLast=0`,
       onChunk: (err, chunk) => {
         receivedChunks.push(err || chunk)
       },
@@ -109,17 +109,15 @@ describe('chunked-request', () => {
     const receivedChunks = [];
     const onComplete = () => {
       const chunkErrors = receivedChunks.filter(v => v instanceof Error);
-      expect(chunkErrors.length).toBe(2, 'two errors caught');
+      expect(chunkErrors.length).toBe(1, 'one errors caught');
       expect(chunkErrors[0].message).toBe('expected');
       expect(chunkErrors[0].rawChunk).toBe(`{ "chunk": "#1", "data": "#0" }\n`);
-      expect(chunkErrors[1].message).toBe('expected');
-      expect(chunkErrors[1].rawChunk).toBe(``);
-
+      
       done();
     };
 
     chunkedRequest({
-      url: `/chunked-response?numChunks=1&entriesPerChunk=1`,
+      url: `/chunked-response?numChunks=1&entriesPerChunk=1&delimitLast=1`,
       chunkParser: () => {
         throw new Error("expected");
       },
@@ -133,7 +131,7 @@ describe('chunked-request', () => {
   describe('response object', () => {
     it('200 OK`', done => {
       chunkedRequest({
-        url: `/chunked-response?numChunks=2&entriesPerChunk=1`,
+        url: `/chunked-response?numChunks=2&entriesPerChunk=1&delimitLast=1`,
         onComplete: result => {
           expect(isObject(result)).toBe(true, 'is an object');
           expect(result.statusCode).toBe(200, 'statusCode');

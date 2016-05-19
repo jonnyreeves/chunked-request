@@ -35,14 +35,14 @@ export default function chunkedRequest(options) {
       parseError.rawChunk = rawChunk;
       parseError.prevChunkSuffix = prevChunkSuffix;
     } finally {
-      if (parseError || (parsedChunks!=null && parsedChunks.length > 0) ) {
+      if (parseError || (parsedChunks !== null && parsedChunks.length > 0)) {
         onChunk(parseError, parsedChunks);
       }
     }
   }
 
   function processRawComplete(rawComplete) {
-    if( prevChunkSuffix != "") {
+    if (prevChunkSuffix != "") {
       // Call the parser with isFinalChunk=true to flush the prevChunkSuffix
       processRawChunk("", true);
     }

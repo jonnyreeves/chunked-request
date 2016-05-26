@@ -80,8 +80,7 @@ module.exports = function(config) {
       '/chunked-response': 'http://localhost:2001/chunked-response',
       '/split-chunked-response': 'http://localhost:2001/split-chunked-response',
       '/error-response': 'http://localhost:2001/error-response',
-      '/echo-response': 'http://localhost:2001/echo-response',
-      '/unknown-host': 'http://localhost:5678'
+      '/echo-response': 'http://localhost:2001/echo-response'
     },
 
 

@@ -155,18 +155,6 @@ describe('chunked-request', () => {
       })
     });
 
-    it('handles connection refused', done => {
-      const onError = err => {
-        expect(err).toBeDefined();
-        done();
-      };
-
-      chunkedRequest({
-        url: `unknown-host`,
-        onError: onError
-      })
-    });
-
     it('should use the supplied request options', done => {
       const receivedChunks = [];
 

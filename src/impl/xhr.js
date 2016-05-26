@@ -30,6 +30,10 @@ export default function xhrRequest(options) {
   }
   xhr.addEventListener('progress', onProgressEvent);
   xhr.addEventListener('loadend', onLoadEvent);
-  xhr.addEventListener('error', options.onError);
+  xhr.addEventListener('error', err => options.onComplete({
+    statusCode: 0,
+    transport: XHR,
+    raw: err
+  }));
   xhr.send(options.body);
 }

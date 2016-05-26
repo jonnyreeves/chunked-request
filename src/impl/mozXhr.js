@@ -34,6 +34,10 @@ export default function mozXhrRequest(options) {
   }
   xhr.addEventListener('progress', onProgressEvent);
   xhr.addEventListener('loadend', onLoadEvent);
-  xhr.addEventListener('error', options.onError);
+  xhr.addEventListener('error', err => options.onComplete({
+    statusCode: 0,
+    transport: MOZ_CHUNKED,
+    raw: err
+  }));
   xhr.send(options.body);
 }

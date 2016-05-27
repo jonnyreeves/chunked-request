@@ -22,6 +22,14 @@ export default function mozXhrRequest(options) {
     });
   }
 
+  function onError(err) {
+    options.onRawComplete({
+      statusCode: 0,
+      transport: MOZ_CHUNKED,
+      raw: err
+    });
+  }
+
   xhr.open(options.method, options.url);
   xhr.responseType = 'moz-chunked-arraybuffer';
   if (options.headers) {
@@ -34,10 +42,6 @@ export default function mozXhrRequest(options) {
   }
   xhr.addEventListener('progress', onProgressEvent);
   xhr.addEventListener('loadend', onLoadEvent);
-  xhr.addEventListener('error', err => options.onComplete({
-    statusCode: 0,
-    transport: MOZ_CHUNKED,
-    raw: err
-  }));
+  xhr.addEventListener('error', onError);
   xhr.send(options.body);
 }

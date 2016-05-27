@@ -18,6 +18,14 @@ export default function xhrRequest(options) {
     });
   }
 
+  function onError(err) {
+    options.onRawComplete({
+      statusCode: 0,
+      transport: XHR,
+      raw: err
+    });
+  }
+
   xhr.open(options.method, options.url);
   xhr.responseType = 'text';
   if (options.headers) {
@@ -30,10 +38,6 @@ export default function xhrRequest(options) {
   }
   xhr.addEventListener('progress', onProgressEvent);
   xhr.addEventListener('loadend', onLoadEvent);
-  xhr.addEventListener('error', err => options.onComplete({
-    statusCode: 0,
-    transport: XHR,
-    raw: err
-  }));
+  xhr.addEventListener('error', onError);
   xhr.send(options.body);
 }

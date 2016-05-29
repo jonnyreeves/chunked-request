@@ -1,3 +1,7 @@
+## unreleased
+### Added
+- Transport exception handling, eg: 'no route to host'. (#8 @Ruben-Hartog)
+
 ## [0.4.0] - 19/05/2016
 ### Added
 - Support responses that do not end with a trailing delimiter (#9, @MarcusLongmuir)

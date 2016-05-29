@@ -85,7 +85,7 @@ A function which will be invoked once when the browser has closed the connection
 * `transport` - The transport used for the request (see `options.transport`)
 * `raw` - The underlying object used to make the request; typically an XHR or fetch response depending on the `transport` value.
 
-Note that the `onChunk` option should be used to process the incoming response body.
+Failed connections will have a status code of 0. Note that the `onChunk` option should be used to process the incoming response body.
 
 #### transport (optional)
 A function which implements the following interface:
@@ -96,4 +96,4 @@ A function which implements the following interface:
 
 The underlying function to use to make the request, see the provided implementations if you wish to provide a custom extension.
 
-If no value is supplied the `chunkedRequest.transportFactory` function will be invoked to determine which transport method to use.  The deafult `transportFactory` will attempt to select the best available method for the current platform; but you can override this method for substituting a test-double or custom implementation.
+If no value is supplied the `chunkedRequest.transportFactory` function will be invoked to determine which transport method to use.  The default `transportFactory` will attempt to select the best available method for the current platform; but you can override this method for substituting a test-double or custom implementation.

@@ -142,7 +142,7 @@ describe('chunked-request', () => {
       })
     });
 
-    it('500 Internal Server Error`', done => {
+    it('500 Internal Server Error', done => {
       chunkedRequest({
         url: `/error-response`,
         onComplete: result => {

@@ -22,8 +22,17 @@ export default function fetchRequest(options) {
       });
   }
 
+  function onError(err) {
+    options.onRawComplete({
+      statusCode: 0,
+      transport: READABLE_BYTE_STREAM,
+      raw: err
+    });
+  }
+
   fetch(options.url, { headers, method, body, credentials })
-    .then(res => pump(res.body.getReader(), res));
+    .then(res => pump(res.body.getReader(), res))
+    .catch(onError);
 }
 
 function marshallHeaders(v) {

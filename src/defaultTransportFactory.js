@@ -6,7 +6,7 @@ let selected = null;
 
 export default function defaultTransportFactory() {
   if (!selected) {
-    if (typeof window.ReadableByteStream === 'function') {
+    if (typeof ReadableByteStream === 'function') {
       selected = fetchRequest;
     } else if (navigator.userAgent.toLowerCase().indexOf('firefox') !== -1) {
       selected = mozXhrRequest;

@@ -1,6 +1,7 @@
 ## unreleased
 ### Added
 - Transport exception handling, eg: 'no route to host'. (#8 @Ruben-Hartog)
+- Support for WebWorkers (#11, @ariutta)
 
 ## [0.4.0] - 19/05/2016
 ### Added

@@ -52,16 +52,14 @@ Determine if HTTP cookies will be sent along with the request, one of `same-orig
 A function which implements the following interface:
 
 ```js
-(rawChunk, previousChunkSuffix, isFinalChunk) => [ parsedChunk, chunkSuffix ]
+(chunkBytes, state, flush) => [ parsed, state ]
 ```
 
-The `chunkParser` takes the raw, textual chunk response returned by the server and converts it into the value passed to the `onChunk` callback (see `options.onChunk`).  The function may also yield an optional chunkSuffix which will be not be passed to the `onChunk` callback but will instead be supplied as the `previousChunkSuffix` value the next time the `chunkParser` is invoked.
+The chunk parser converts the supplied Uint8Array of bytes into structured data which will be supplied to the `onChunk` callback.  If no `chunkParser` function is supplied the `defaultChunkParser` will be used which expects the data to be JSON literals delimited by newline (`\\n`) characters.
 
-If the `chunkParser` throws an exception, the chunk will be discarded and the error that was raised will be passed to the `onChunk` callback augmented with a `rawChunk` property consisting of the textual chunk for logging / recovery.
+See [Writing a Custom Chunk Parser](#Writing a Custom Chunk Parser) below for more deatils on how to implement this interface.
 
-If no `chunkParser` is supplied the `defaultChunkParser` will be used which expects the chunks returned by the server to consist of one or more `\n` delimited lines of JSON object literals which are parsed into an Array.
-
-`chunkParser` will be called with `isFinalChunk` as `true` when the response has completed and there was a non-empty `chunkSuffix` from the last chunk. The `rawChunk` will be an empty string and the `previousChunkSuffix` will be the last returned `chunkSuffix`.
+If the `chunkParser` throws an exception, the chunk will be discarded and the error that was raised will be passed to the `onChunk` callback augmented with a `chunkBytes` property that contains the byte Array supplied to the parser and a `parserState` property which contains the state that was supplied (see below).
 
 #### onChunk (optional)
 A function which implements the following interface:
@@ -94,6 +92,68 @@ A function which implements the following interface:
 ({ url, headers, method, body, credentials, onComplete, onRawChunk }) => undefined
 ```
 
-The underlying function to use to make the request, see the provided implementations if you wish to provide a custom extension.
+The underlying function used to make the request, see the provided implementations if you wish to provide a custom extension.  Note that you must supply a Uint8Array to the `onRawChunk` callback.
 
 If no value is supplied the `chunkedRequest.transportFactory` function will be invoked to determine which transport method to use.  The default `transportFactory` will attempt to select the best available method for the current platform; but you can override this method for substituting a test-double or custom implementation.
+
+
+## Writing a Custom Chunk Parser
+The `chunkParser` takes a 'chunk' of bytes in the form of a `Uint8Array` which were provided by the remote server and then converts it into the value passed to the `onChunk` callback (see `options.onChunk`).  In it's simplest form the `chunkParser` acts as a passthru; the following example converts the supplied bytes into a string:
+
+```js
+chunkedRequest({
+  chunkParser(bytes) {
+    const str = utf8BytesToString(bytes);
+    return [ str ];
+  }
+  onChunk(err, str) {
+    console.log(`Chunk recieved: ${str}`);
+  }
+}
+```
+
+
+Chunk Parsers will typically be dealing with structured data (eg: JSON literals) where a message can only be parsed if it is well formed (ie: a complete JSON literal).  Because of the nature of chunked transfer, the server may end up flushing a chunk of data to the browser that contains an incomplete datastructure.  The example below illustrates this where the first chunk from the server (Chunk 1) has an incomplete JSON literal which is subsiquently completed by the proceeding chunk (Chunk 2).
+
+```
+Server (Chunk 1)> { "name": "Jonny" }\n{ "name": "Frank" }\n{ "na
+Server (Chunk 2)> me": "Bob" }
+```
+
+A naieve chunk parser implementation would attempt to parse the JSON literals contained in each chunk like so:
+
+```js
+chunkParser(bytes) {
+  const jsonLiterals = utf8BytesToString(bytes).split("\n");
+  // This will not work; Array index 2 `'{ "nam' is an incomplete JSON
+  // literal and will cause a SyntaxError from JSON.parse
+  return [ jsonLiterals.map(v => JSON.parse(v)) ];
+}
+```
+
+Instead, the chunkParser should make use of the `state` object to retain any incomplete messages so they can be processed in the next pass:
+
+```js
+chunkParser(bytes, state = {}) {
+  const jsonLiterals = utf8BytesToString(bytes).split("\n");
+
+  // Does the state object contain any data that was not parsed
+  // in a previous pass (see below).
+  if (state.trailer) {
+    // Glue the data back together for a (potentially) complete literal.
+    jsonLiterals[0] = `${state.trailer}${jsonLiterals[0]}`;
+  }
+  
+  // Check to see if the last literal parsed from this chunk ended with a 
+  // message delimiter.
+  if (jsonLiterals[jsonLiterals.length-1] !== "\n") {
+    // move the last entry into the parser's state as it's incomplete; we
+    // can process it on the next pass.
+    state.trailer = jsonLiterals.pop();
+  }
+
+  return [ jsonLiterals.map(v => JSON.parse(v)), state ];
+}
+```
+
+Finally, stateful chunk parsers must observe the third argument, `flush`.  This flag will be true when the server has closed the conneciton indicating that there will be no further data.  The chunkParser must process any remaining data in the state object at this point.

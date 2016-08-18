@@ -20,31 +20,32 @@ export default function chunkedRequest(options) {
     chunkParser = defaultChunkParser
   } = options;
 
-  let prevChunkSuffix = "";
+  // parserState can be utilised by the chunkParser to hold on to state; the
+  // defaultChunkParser uses it to keep track of any trailing text the last
+  // delimiter in the chunk.  There is no contract for parserState.
+  let parserState;
 
-  function processRawChunk(rawChunk, isFinalChunk = false) {
+  function processRawChunk(chunkBytes, flush = false) {
     let parsedChunks = null;
     let parseError = null;
-    let suffix = "";
 
     try {
-      [ parsedChunks, suffix ] = chunkParser(rawChunk, prevChunkSuffix, isFinalChunk);
-      prevChunkSuffix = suffix || "";
+      [ parsedChunks, parserState ] = chunkParser(chunkBytes, parserState, flush);
     } catch (e) {
       parseError = e;
-      parseError.rawChunk = rawChunk;
-      parseError.prevChunkSuffix = prevChunkSuffix;
+      parseError.chunkBytes = chunkBytes;
+      parseError.parserState = parserState;
     } finally {
-      if (parseError || (parsedChunks !== null && parsedChunks.length > 0)) {
+      if (parseError || (parsedChunks && parsedChunks.length > 0)) {
         onChunk(parseError, parsedChunks);
       }
     }
   }
 
   function processRawComplete(rawComplete) {
-    if (prevChunkSuffix != "") {
-      // Call the parser with isFinalChunk=true to flush the prevChunkSuffix
-      processRawChunk("", true);
+    if (parserState) {
+      // Flush the parser to process any remaining state.
+      processRawChunk(new Uint8Array(), true);
     }
     onComplete(rawComplete);
   }

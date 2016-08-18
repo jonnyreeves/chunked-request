@@ -1,6 +1,7 @@
 import chunkedRequest from '../../src/index';
 import isEqual from 'lodash/isEqual';
 import isObject from 'lodash/isObject';
+import { getStringFromBytes } from 'utf-8';
 
 // These integration tests run through Karma; check `karma.conf.js` for
 // configuration.  Note that the dev-server which provides the `/chunked-response`
@@ -24,7 +25,27 @@ describe('chunked-request', () => {
       url: `/chunked-response?numChunks=1&entriesPerChunk=1&delimitLast=1`,
       onChunk: (err, chunk) => receivedChunks.push(err || chunk),
       onComplete
-    })
+    });
+  });
+
+  it('should parse utf8 responses', done => {
+    const receivedChunks = [];
+
+    const onComplete = () => {
+      const chunkErrors = receivedChunks.filter(v => v instanceof Error);
+
+      expect(receivedChunks.length).toBe(1, 'receivedChunks');
+      expect(chunkErrors.length).toBe(0, 'of which errors');
+      expect(isEqual(receivedChunks, [ [ {message: "𝌆"} ] ])).toBe(true, 'parsed chunks');
+
+      done();
+    };
+
+    chunkedRequest({
+      url: `/chunked-utf8-response`,
+      onChunk: (err, chunk) => receivedChunks.push(err || chunk),
+      onComplete
+    });
   });
 
   it('should parse a response that consists of two chunks and ends with a delimiter', done => {
@@ -111,15 +132,20 @@ describe('chunked-request', () => {
       const chunkErrors = receivedChunks.filter(v => v instanceof Error);
       expect(chunkErrors.length).toBe(1, 'one errors caught');
       expect(chunkErrors[0].message).toBe('expected');
-      expect(chunkErrors[0].rawChunk).toBe(`{ "chunk": "#1", "data": "#0" }\n`);
+
+      const rawChunkStr = getStringFromBytes(chunkErrors[0].chunkBytes);
+      expect(rawChunkStr).toBe(`{ "chunk": "#1", "data": "#0" }\n`);
       
       done();
     };
 
     chunkedRequest({
       url: `/chunked-response?numChunks=1&entriesPerChunk=1&delimitLast=1`,
-      chunkParser: () => {
-        throw new Error("expected");
+      chunkParser: (chunkBytes, state, flush) => {
+        if (!flush) {
+          throw new Error("expected");
+        }
+        return [];
       },
       onChunk: (err, chunk) => {
         receivedChunks.push(err || chunk)

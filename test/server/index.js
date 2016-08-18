@@ -66,6 +66,13 @@ function serveSplitChunkedResponse(req, res) {
   }, chunkIntervalMs);
 }
 
+function serveChunkedUtf8Response(req, res) {
+  res.setHeader('Content-Type', 'text/html; charset=UTF-8');
+  res.setHeader('Transfer-Encoding', 'chunked');
+  res.write(JSON.stringify({ "message": "𝌆" }) + "\n");
+  res.end();
+}
+
 function serveChunkedResponse(req, res) {
   const query = url.parse(req.url, true).query;
   const numChunks = parseInt(query.numChunks, 10) || 4;
@@ -108,6 +115,8 @@ function handler(req, res) {
   switch (req.parsedUrl.pathname) {
   case '/chunked-response':
     return serveChunkedResponse(req, res);
+  case '/chunked-utf8-response':
+    return serveChunkedUtf8Response(req, res);
   case '/split-chunked-response':
     return serveSplitChunkedResponse(req, res);
   case '/echo-response':

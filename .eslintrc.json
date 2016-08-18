@@ -5,6 +5,9 @@
     "no-var": 2,
     "prefer-const": 2
   },
+  "env": {
+    "browser": true
+  },
   "parserOptions": {
     "ecmaVersion": 6,
     "sourceType": "module"

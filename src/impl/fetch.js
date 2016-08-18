@@ -3,7 +3,6 @@ import { isObject } from '../util';
 export const READABLE_BYTE_STREAM = 'readable-byte-stream';
 
 export default function fetchRequest(options) {
-  const decoder = new TextDecoder();
   const { onRawChunk, onRawComplete, method, body, credentials } = options;
   const headers = marshallHeaders(options.headers);
 
@@ -17,7 +16,7 @@ export default function fetchRequest(options) {
             raw: res
           });
         }
-        onRawChunk(decoder.decode(result.value));
+        onRawChunk(result.value);
         return pump(reader, res);
       });
   }

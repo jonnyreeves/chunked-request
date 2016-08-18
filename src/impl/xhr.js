@@ -1,3 +1,5 @@
+import { uint8ArrayFromString } from '../util';
+
 export const XHR = 'xhr';
 
 export default function xhrRequest(options) {
@@ -5,9 +7,9 @@ export default function xhrRequest(options) {
   let index = 0;
 
   function onProgressEvent() {
-    const rawChunk = xhr.responseText.substr(index);
+    const rawText = xhr.responseText.substr(index);
     index = xhr.responseText.length;
-    options.onRawChunk(rawChunk);
+    options.onRawChunk(uint8ArrayFromString(rawText));
   }
 
   function onLoadEvent() {

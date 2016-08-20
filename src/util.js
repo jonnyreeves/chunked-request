@@ -34,3 +34,13 @@ export const root = rootCandidate;
 
 export const TextEncoder = (typeof root.TextEncoder !== 'undefined') ? root.TextEncoder : textEncoding.TextEncoder;
 export const TextDecoder = (typeof root.TextDecoder !== 'undefined') ? root.TextDecoder : textEncoding.TextDecoder;
+
+export function uint8ArrayFromString(str) {
+  const encoder = new TextEncoder();
+  return encoder.encode(str);
+}
+
+export function stringFromUint8Array(arr) {
+  const decoder = new TextDecoder();
+  return decoder.decode(arr);
+}

@@ -1,7 +1,28 @@
 import chunkedRequest from '../../src/index';
 import isEqual from 'lodash/isEqual';
 import isObject from 'lodash/isObject';
-import { TextDecoderPolyfill } from '../../lib/util';
+
+// NOTE intentionally using different utf8 implementation here than
+// in the lib in order to lower the chance of getting erroneous
+// results in both.
+import defaults from 'lodash';
+import typedArrayPolyfill from 'typedarray';
+import { getStringFromBytes } from 'utf-8';
+/**
+ * Root reference for iframes.
+ * Taken from https://github.com/visionmedia/superagent/blob/master/lib/client.js
+ */
+let rootCandidate;
+if (typeof window !== 'undefined') { // Browser window
+  rootCandidate = window;
+} else if (typeof self !== 'undefined') { // Web Worker
+  rootCandidate = self;
+} else { // Other environments
+  // TODO should we warn here?
+  //console.warn('Using browser-only version of superagent in non-browser environment');
+  rootCandidate = this;
+}
+defaults(rootCandidate, typedArrayPolyfill);
 
 // These integration tests run through Karma; check `karma.conf.js` for
 // configuration.  Note that the dev-server which provides the `/chunked-response`
@@ -133,7 +154,7 @@ describe('chunked-request', () => {
       expect(chunkErrors.length).toBe(1, 'one errors caught');
       expect(chunkErrors[0].message).toBe('expected');
 
-      const rawChunkStr = new TextDecoderPolyfill().decode(chunkErrors[0].chunkBytes);
+      const rawChunkStr = getStringFromBytes(chunkErrors[0].chunkBytes);
       expect(rawChunkStr).toBe(`{ "chunk": "#1", "data": "#0" }\n`);
       
       done();

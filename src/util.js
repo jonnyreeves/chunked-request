@@ -32,5 +32,5 @@ defaults(rootCandidate, typedArrayPolyfill);
 
 export const root = rootCandidate;
 
-export const TextEncoderPolyfill = textEncoding.TextEncoder;
-export const TextDecoderPolyfill = textEncoding.TextDecoder;
+export const TextEncoder = (typeof root.TextEncoder !== 'undefined') ? root.TextEncoder : textEncoding.TextEncoder;
+export const TextDecoder = (typeof root.TextDecoder !== 'undefined') ? root.TextDecoder : textEncoding.TextDecoder;

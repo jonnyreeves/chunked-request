@@ -16,6 +16,7 @@
   "scripts": {
     "prepublish": "npm run clean && npm run build:lib",
     "clean": "rm -rf build/*",
+    "build:bundle": "rm -rf lib && mkdir lib && browserify ./src/index.js -o bundle.js --standalone chunkedRequest --debug -t [ babelify ]",
     "build:integ": "mkdir -p build && browserify test/integ/*.spec.js -o build/integration-tests.js --debug -t [ babelify ]",
     "build:lib": "mkdir -p lib && babel --out-dir lib src",
     "lint": "eslint .",
@@ -37,11 +38,11 @@
     "karma-jasmine": "^1.0.2",
     "karma-sauce-launcher": "^1.0.0",
     "lodash": "^4.15.0",
-    "url": "^0.11.0"
+    "url": "^0.11.0",
+    "utf-8": "^1.0.0"
   },
   "dependencies": {
     "text-encoding-utf-8": "^1.0.1",
-    "typedarray": "0.0.6",
-    "utf-8": "^1.0.0"
+    "typedarray": "0.0.6"
   }
 }

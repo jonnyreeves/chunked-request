@@ -1,14 +1,9 @@
-import { root, TextEncoderPolyfill } from '../util';
+import { TextEncoder } from '../util';
 
 export const XHR = 'xhr';
 
 export default function xhrRequest(options) {
-  let textEncoder;
-  if (typeof root.TextEncoder !== 'undefined') {
-    textEncoder = new root.TextEncoder();
-  } else {
-    textEncoder = new TextEncoderPolyfill();
-  }
+  const textEncoder = new TextEncoder();
   const xhr = new XMLHttpRequest();
   let index = 0;
 

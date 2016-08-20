@@ -45,7 +45,7 @@ export default function chunkedRequest(options) {
   function processRawComplete(rawComplete) {
     if (parserState) {
       // Flush the parser to process any remaining state.
-      processRawChunk(new Uint8Array(), true);
+      processRawChunk(null, true);
     }
     onComplete(rawComplete);
   }

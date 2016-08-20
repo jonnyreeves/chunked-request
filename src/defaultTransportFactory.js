@@ -5,10 +5,11 @@ import xhrRequest from './impl/xhr';
 let selected = null;
 
 export default function defaultTransportFactory() {
+  const userAgent = navigator.userAgent.toLowerCase();
   if (!selected) {
-    if (typeof ReadableByteStream === 'function') {
+    if (userAgent.indexOf('chrome') !== -1) {
       selected = fetchRequest;
-    } else if (navigator.userAgent.toLowerCase().indexOf('firefox') !== -1) {
+    } else if (userAgent.indexOf('firefox') !== -1) {
       selected = mozXhrRequest;
     } else {
       selected = xhrRequest;
@@ -16,4 +17,3 @@ export default function defaultTransportFactory() {
   }
   return selected;
 }
-

@@ -1,6 +1,6 @@
-import { root, TextDecoderPolyfill } from './util';
+import { TextDecoder } from './util';
 
-const entryDelimiter = '\n';
+const entryDelimiters = ['\r\n', '\n'];
 
 // The defaultChunkParser expects the response from the server to consist of new-line
 // delimited JSON, eg:
@@ -11,27 +11,26 @@ const entryDelimiter = '\n';
 // It will correctly handle the case where a chunk is emitted by the server across
 // delimiter boundaries.
 export default function defaultChunkParser(bytes, state = {}, flush = false) {
-  root.console.log('TextDecoderPolyfill');
-  root.console.log(TextDecoderPolyfill);
-  root.console.log('typeof TextDecoder');
-  root.console.log(typeof TextDecoder);
-  let textDecoder;
-  if (typeof root.TextDecoder !== 'undefined') {
-    textDecoder = new root.TextDecoder();
-  } else {
-    textDecoder = new TextDecoderPolyfill();
-  }
 
-  const chunkStr = textDecoder.decode(bytes);
-  const jsonLiterals = chunkStr.split(entryDelimiter);
+  const textDecoder = new TextDecoder();
+  const chunkStr = bytes ? textDecoder.decode(bytes, {stream: !flush}) : '';
+
+  const jsonLiterals = entryDelimiters.reduce(function(acc, entryDelimiter) {
+    return acc.reduce(function(subacc, x) {
+      return subacc.concat(x.split(entryDelimiter));
+    }, []);
+  }, [chunkStr]);
+
   if (state.trailer) {
     jsonLiterals[0] = `${state.trailer}${jsonLiterals[0]}`;
   }
 
-  // Is this a complete message?  If not; push the trailing (incomplete) string 
+  // Is this a complete message?  If not, push the trailing (incomplete) string 
   // into the state. 
-  if (!flush && !hasSuffix(chunkStr, entryDelimiter)) {
+  if (!flush && !hasSuffix(chunkStr, entryDelimiters)) {
     state.trailer = jsonLiterals.pop();
+  } else {
+    state.trailer = null;
   }
 
   const jsonObjects = jsonLiterals
@@ -41,6 +40,8 @@ export default function defaultChunkParser(bytes, state = {}, flush = false) {
   return [ jsonObjects, state ];
 }
 
-function hasSuffix(s, suffix) {
-  return s.substr(s.length - suffix.length) === suffix;
+function hasSuffix(s, suffixes) {
+  return suffixes.reduce(function(acc, suffix) {
+    return acc || s.substr(s.length - suffix.length) === suffix;
+  }, false);
 }

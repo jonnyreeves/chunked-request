@@ -1,7 +1,7 @@
 import chunkedRequest from '../../src/index';
 import isEqual from 'lodash/isEqual';
 import isObject from 'lodash/isObject';
-import { getStringFromBytes } from 'utf-8';
+import { TextDecoderPolyfill } from '../../lib/util';
 
 // These integration tests run through Karma; check `karma.conf.js` for
 // configuration.  Note that the dev-server which provides the `/chunked-response`
@@ -133,7 +133,7 @@ describe('chunked-request', () => {
       expect(chunkErrors.length).toBe(1, 'one errors caught');
       expect(chunkErrors[0].message).toBe('expected');
 
-      const rawChunkStr = getStringFromBytes(chunkErrors[0].chunkBytes);
+      const rawChunkStr = new TextDecoderPolyfill().decode(chunkErrors[0].chunkBytes);
       expect(rawChunkStr).toBe(`{ "chunk": "#1", "data": "#0" }\n`);
       
       done();

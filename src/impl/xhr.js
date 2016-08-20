@@ -1,15 +1,27 @@
-import { uint8ArrayFromString } from '../util';
+import { root, TextEncoderPolyfill } from '../util';
 
 export const XHR = 'xhr';
 
 export default function xhrRequest(options) {
+  root.console.log('TextEncoderPolyfill');
+  root.console.log(TextEncoderPolyfill);
+  root.console.log('typeof TextEncoder');
+  root.console.log(typeof TextEncoder);
+  let textEncoder;
+  if (typeof root.TextEncoder !== 'undefined') {
+    textEncoder = new root.TextEncoder();
+  } else {
+    textEncoder = new TextEncoderPolyfill();
+  }
+  root.console.log('textEncoder');
+  root.console.log(textEncoder);
   const xhr = new XMLHttpRequest();
   let index = 0;
 
   function onProgressEvent() {
     const rawText = xhr.responseText.substr(index);
     index = xhr.responseText.length;
-    options.onRawChunk(uint8ArrayFromString(rawText));
+    options.onRawChunk(textEncoder.encode(rawText));
   }
 
   function onLoadEvent() {

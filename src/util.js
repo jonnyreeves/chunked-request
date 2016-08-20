@@ -25,14 +25,7 @@ export  function noop() {
   /* No operation */
 }
 
-//export function uint8ArrayFromString(str) {
-//  let size = 0;
-//  for (let i = 0, len = str.length; i < len; i++) {
-//    size += getBytesForCharCode(str.charCodeAt(i))
-//  }
-//  return setBytesFromString(str, new Uint8Array(size), 0, size, true);
-//}
-
+// TODO is defaults the right thing to do here for a polyfill?
 typedArrayPolyfill.TextEncoder = textEncoding.TextEncoder;
 typedArrayPolyfill.TextDecoder = textEncoding.TextDecoder;
 defaults(rootCandidate, typedArrayPolyfill);

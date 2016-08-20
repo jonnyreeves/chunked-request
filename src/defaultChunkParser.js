@@ -23,7 +23,6 @@ export default function defaultChunkParser(bytes, state = {}, flush = false) {
   }
 
   const chunkStr = textDecoder.decode(bytes);
-  //const chunkStr = getStringFromBytes(bytes, 0, undefined, true);
   const jsonLiterals = chunkStr.split(entryDelimiter);
   if (state.trailer) {
     jsonLiterals[0] = `${state.trailer}${jsonLiterals[0]}`;

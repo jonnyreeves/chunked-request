@@ -16,6 +16,12 @@ $ npm install chunked-request
 
 or as a standalone ES5 browser script by obtaining `dist/chunked-request.js` from a [tagged release](https://github.com/jonnyreeves/chunked-request/releases).
 
+## Browser Support
+This library is tested against IE 10, Safari, Firefox and Chrome.  It relies on browser support for [TypedArray](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/TypedArray), [TextDecoder](https://developer.mozilla.org/en-US/docs/Web/API/TextEncoder) and [TextDecoder](https://developer.mozilla.org/en-US/docs/Web/API/TextDecoder) Browser APIs; for legacy environments such as Safari and IE10, you will need to supply one or more of the polyfills listed below:
+
+* [TextEncoder / TextDecoder Polyfill](https://www.npmjs.com/package/text-encoding) (IE10, Safari)
+* [TypedArray](https://github.com/inexorabletash/polyfill/blob/master/typedarray.js) (IE10)
+
 ## API
 
 ```js

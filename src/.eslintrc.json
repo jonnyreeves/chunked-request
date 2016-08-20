@@ -1,9 +1,8 @@
 {
-  "env": {
-    "browser": true
-  },
   "globals": {
-    "Uint8Array": false
+    "Uint8Array": false,
+    "TextEncoder": false,
+    "TextDecoder": false
   },
   "rules": {
     "no-var": 2

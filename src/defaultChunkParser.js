@@ -1,4 +1,4 @@
-import { getStringFromBytes } from 'utf-8';
+import { stringFromUint8Array } from './util';
 
 const entryDelimiter = '\n';
 
@@ -11,7 +11,7 @@ const entryDelimiter = '\n';
 // It will correctly handle the case where a chunk is emitted by the server across
 // delimiter boundaries.
 export default function defaultChunkParser(bytes, state = {}, flush = false) {
-  const chunkStr = getStringFromBytes(bytes, 0, undefined, true);
+  const chunkStr = stringFromUint8Array(bytes);
   const jsonLiterals = chunkStr.split(entryDelimiter);
   if (state.trailer) {
     jsonLiterals[0] = `${state.trailer}${jsonLiterals[0]}`;

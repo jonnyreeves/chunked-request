@@ -1,5 +1,3 @@
-import { getBytesForCharCode, setBytesFromString } from 'utf-8';
-
 export function isObject(value) {
   return !!value && typeof value === 'object';
 }
@@ -9,9 +7,11 @@ export  function noop() {
 }
 
 export function uint8ArrayFromString(str) {
-  let size = 0;
-  for (let i = 0, len = str.length; i < len; i++) {
-    size += getBytesForCharCode(str.charCodeAt(i))
-  }
-  return setBytesFromString(str, new Uint8Array(size), 0, size, true);
+  const encoder = new TextEncoder();
+  return encoder.encode(str);
+}
+
+export function stringFromUint8Array(arr) {
+  const decoder = new TextDecoder();
+  return decoder.decode(arr);
 }

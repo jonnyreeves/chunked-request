@@ -40,6 +40,8 @@
     "url": "^0.11.0"
   },
   "dependencies": {
+    "text-encoding-utf-8": "^1.0.1",
+    "typedarray": "0.0.6",
     "utf-8": "^1.0.0"
   }
 }

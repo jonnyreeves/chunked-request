@@ -1,4 +1,4 @@
-import { getStringFromBytes } from 'utf-8';
+import { root, TextDecoderPolyfill } from './util';
 
 const entryDelimiter = '\n';
 
@@ -11,7 +11,18 @@ const entryDelimiter = '\n';
 // It will correctly handle the case where a chunk is emitted by the server across
 // delimiter boundaries.
 export default function defaultChunkParser(bytes, state = {}, flush = false) {
-  const chunkStr = getStringFromBytes(bytes, 0, undefined, true);
+  root.console.log('TextDecoderPolyfill');
+  root.console.log(TextDecoderPolyfill);
+  root.console.log('typeof TextDecoder');
+  root.console.log(typeof TextDecoder);
+  let textDecoder;
+  if (typeof root.TextDecoder !== 'undefined') {
+    textDecoder = new root.TextDecoder();
+  } else {
+    textDecoder = new TextDecoderPolyfill();
+  }
+
+  const chunkStr = textDecoder.decode(bytes);
   const jsonLiterals = chunkStr.split(entryDelimiter);
   if (state.trailer) {
     jsonLiterals[0] = `${state.trailer}${jsonLiterals[0]}`;

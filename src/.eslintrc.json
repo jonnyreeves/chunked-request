@@ -1,9 +1,4 @@
 {
-  "globals": {
-    "Uint8Array": false,
-    "TextEncoder": false,
-    "TextDecoder": false
-  },
   "rules": {
     "no-var": 2
   }

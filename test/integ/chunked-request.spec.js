@@ -28,6 +28,21 @@ describe('chunked-request', () => {
     });
   });
 
+  it('should supply a Uint8Array to the chunkParser', done => {
+    let actual = false;
+
+    const onComplete = () => {
+      expect(actual).toBe(true);
+      done();
+    };
+
+    chunkedRequest({
+      url: `/chunked-response?numChunks=1&entriesPerChunk=1&delimitLast=1`,
+      chunkParser: bytes => { actual = (bytes instanceof Uint8Array); },
+      onComplete
+    });
+  });
+
   it('should parse utf8 responses', done => {
     const receivedChunks = [];
 

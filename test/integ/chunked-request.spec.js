@@ -1,4 +1,3 @@
-import './polyfill';
 import chunkedRequest from '../../src/index';
 import isEqual from 'lodash/isEqual';
 import isObject from 'lodash/isObject';

@@ -1,5 +1,3 @@
-import { TextDecoder } from './util';
-
 const entryDelimiters = ['\r\n', '\n'];
 
 // The defaultChunkParser expects the response from the server to consist of new-line

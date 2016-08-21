@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+
+  <body>
+    <h1>Demo</h1>
+    <div id="content" style="font-size: 5px;"></div>
+
+    <script src="../dist/polyfills.js"></script>
+    <script src="../dist/chunkedRequest.js"></script>
+    <script>
+      var contentEl = document.querySelector('#content');
+      chunkedRequest.default({
+        url: 'https://cdn.rawgit.com/maxogden/sqlite-search/master/test.ndjson',
+        method: 'GET',
+        onChunk: function(err, x) {
+          if (err) {
+            throw err;
+          }
+          console.log(x)
+          contentEl.textContent += JSON.stringify(x, null, '  ');
+        },
+        onComplete: function(x) {
+          console.log('complete')
+          console.log(x)
+        }
+      });
+    </script>
+  </body>
+
+</html>

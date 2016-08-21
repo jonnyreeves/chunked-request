@@ -1,6 +1,10 @@
-import defaults from 'lodash';
-import textEncoding from 'text-encoding-utf-8';
-import typedArrayPolyfill from 'typedarray';
+export function isObject(value) {
+  return !!value && typeof value === 'object';
+}
+
+export  function noop() {
+  /* No operation */
+}
 
 /**
  * Root reference for iframes.
@@ -16,31 +20,6 @@ if (typeof window !== 'undefined') { // Browser window
   //console.warn('Using browser-only version of superagent in non-browser environment');
   rootCandidate = this;
 }
-
-export function isObject(value) {
-  return !!value && typeof value === 'object';
-}
-
-export  function noop() {
-  /* No operation */
-}
-
-// TODO is defaults the right thing to do here for a polyfill?
-typedArrayPolyfill.TextEncoder = textEncoding.TextEncoder;
-typedArrayPolyfill.TextDecoder = textEncoding.TextDecoder;
-defaults(rootCandidate, typedArrayPolyfill);
-
+// TODO is there a nicer way to export this without
+// defining rootCandidate?
 export const root = rootCandidate;
-
-export const TextEncoder = (typeof root.TextEncoder !== 'undefined') ? root.TextEncoder : textEncoding.TextEncoder;
-export const TextDecoder = (typeof root.TextDecoder !== 'undefined') ? root.TextDecoder : textEncoding.TextDecoder;
-
-export function uint8ArrayFromString(str) {
-  const encoder = new TextEncoder();
-  return encoder.encode(str);
-}
-
-export function stringFromUint8Array(arr) {
-  const decoder = new TextDecoder();
-  return decoder.decode(arr);
-}

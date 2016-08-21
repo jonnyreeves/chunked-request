@@ -1,5 +1,3 @@
-import { TextEncoder } from '../util';
-
 export const XHR = 'xhr';
 
 export default function xhrRequest(options) {

@@ -16,7 +16,7 @@
   "scripts": {
     "prepublish": "npm run clean && npm run build:lib",
     "clean": "rm -rf build/*",
-    "build:bundle": "browserify ./src/index.js -o dist/chunkedRequest.js --standalone chunkedRequest --debug -t [ babelify ] && npm run build:polyfills",
+    "build:bundle": "rm -rf dist && mkdir dist && browserify ./src/index.js -o dist/chunkedRequest.js --standalone chunkedRequest --debug -t [ babelify ] && npm run build:polyfills",
     "build:integ": "mkdir -p build && browserify test/integ/*.spec.js -o build/integration-tests.js --debug -t [ babelify ]",
     "build:lib": "mkdir -p lib && babel --out-dir lib src",
     "build:polyfills": "browserify ./src/polyfills.js -o dist/polyfills.js --debug -t [ babelify ]",

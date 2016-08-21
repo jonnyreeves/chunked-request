@@ -8,10 +8,11 @@ export default function xhrRequest(options) {
   function onProgressEvent() {
     const rawText = xhr.responseText.substr(index);
     index = xhr.responseText.length;
-    options.onRawChunk(textEncoder.encode(rawText));
+    options.onRawChunk(textEncoder.encode(rawText, {stream: true}));
   }
 
   function onLoadEvent() {
+    options.onRawChunk(textEncoder.encode(null, {stream: false}));
     options.onRawComplete({
       statusCode: xhr.status,
       transport: XHR,

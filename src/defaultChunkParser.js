@@ -9,8 +9,11 @@ const entryDelimiters = ['\r\n', '\n'];
 // It will correctly handle the case where a chunk is emitted by the server across
 // delimiter boundaries.
 export default function defaultChunkParser(bytes, state = {}, flush = false) {
+  if (!state.textDecoder) {
+    state.textDecoder = new TextDecoder();
+  }
+  const textDecoder = state.textDecoder;
 
-  const textDecoder = new TextDecoder();
   const chunkStr = bytes ? textDecoder.decode(bytes, {stream: !flush}) : '';
 
   const jsonLiterals = entryDelimiters.reduce(function(acc, entryDelimiter) {

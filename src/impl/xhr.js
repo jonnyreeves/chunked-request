@@ -12,6 +12,7 @@ export default function xhrRequest(options) {
   }
 
   function onLoadEvent() {
+    // Force the textEncoder to flush.
     options.onRawChunk(textEncoder.encode(null, { stream: false }));
     options.onRawComplete({
       statusCode: xhr.status,

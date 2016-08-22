@@ -157,7 +157,7 @@ describe('chunked-request', () => {
     chunkedRequest({
       url: `/chunked-response?numChunks=1&entriesPerChunk=1&delimitLast=1`,
       chunkParser: (chunkBytes, state, flush) => {
-        if (!flush) {
+        if (chunkBytes.length > 0 && !flush) {
           throw new Error("expected");
         }
         return [];

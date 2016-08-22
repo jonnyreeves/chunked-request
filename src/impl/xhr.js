@@ -1,18 +1,18 @@
-import { uint8ArrayFromString } from '../util';
-
 export const XHR = 'xhr';
 
 export default function xhrRequest(options) {
+  const textEncoder = new TextEncoder();
   const xhr = new XMLHttpRequest();
   let index = 0;
 
   function onProgressEvent() {
     const rawText = xhr.responseText.substr(index);
     index = xhr.responseText.length;
-    options.onRawChunk(uint8ArrayFromString(rawText));
+    options.onRawChunk(textEncoder.encode(rawText, { stream: true }));
   }
 
   function onLoadEvent() {
+    options.onRawChunk(textEncoder.encode(null, { stream: false }));
     options.onRawComplete({
       statusCode: xhr.status,
       transport: XHR,

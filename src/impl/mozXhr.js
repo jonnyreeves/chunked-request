@@ -4,14 +4,7 @@ export default function mozXhrRequest(options) {
   const xhr = new XMLHttpRequest();
 
   function onProgressEvent() {
-    const view = new Uint8Array(xhr.response);
-    let len = view.length;
-
-    const rawString = new Array(len);
-    while(len--) {
-      rawString[len] = String.fromCharCode(view[len]);
-    }
-    options.onRawChunk(rawString.join(''));
+    options.onRawChunk(new Uint8Array(xhr.response));
   }
 
   function onLoadEvent() {

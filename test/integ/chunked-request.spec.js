@@ -24,7 +24,42 @@ describe('chunked-request', () => {
       url: `/chunked-response?numChunks=1&entriesPerChunk=1&delimitLast=1`,
       onChunk: (err, chunk) => receivedChunks.push(err || chunk),
       onComplete
-    })
+    });
+  });
+
+  it('should supply a Uint8Array to the chunkParser', done => {
+    let actual = false;
+
+    const onComplete = () => {
+      expect(actual).toBe(true);
+      done();
+    };
+
+    chunkedRequest({
+      url: `/chunked-response?numChunks=1&entriesPerChunk=1&delimitLast=1`,
+      chunkParser: bytes => { actual = (bytes instanceof Uint8Array); },
+      onComplete
+    });
+  });
+
+  it('should parse utf8 responses', done => {
+    const receivedChunks = [];
+
+    const onComplete = () => {
+      const chunkErrors = receivedChunks.filter(v => v instanceof Error);
+
+      expect(receivedChunks.length).toBe(1, 'receivedChunks');
+      expect(chunkErrors.length).toBe(0, 'of which errors');
+      expect(isEqual(receivedChunks, [ [ {message: "𝌆"} ] ])).toBe(true, 'parsed chunks');
+
+      done();
+    };
+
+    chunkedRequest({
+      url: `/chunked-utf8-response`,
+      onChunk: (err, chunk) => receivedChunks.push(err || chunk),
+      onComplete
+    });
   });
 
   it('should parse a response that consists of two chunks and ends with a delimiter', done => {
@@ -111,15 +146,20 @@ describe('chunked-request', () => {
       const chunkErrors = receivedChunks.filter(v => v instanceof Error);
       expect(chunkErrors.length).toBe(1, 'one errors caught');
       expect(chunkErrors[0].message).toBe('expected');
-      expect(chunkErrors[0].rawChunk).toBe(`{ "chunk": "#1", "data": "#0" }\n`);
+
+      const rawChunkStr = new TextDecoder().decode(chunkErrors[0].chunkBytes);
+      expect(rawChunkStr).toBe(`{ "chunk": "#1", "data": "#0" }\n`);
       
       done();
     };
 
     chunkedRequest({
       url: `/chunked-response?numChunks=1&entriesPerChunk=1&delimitLast=1`,
-      chunkParser: () => {
-        throw new Error("expected");
+      chunkParser: (chunkBytes, state, flush) => {
+        if (chunkBytes.length > 0 && !flush) {
+          throw new Error("expected");
+        }
+        return [];
       },
       onChunk: (err, chunk) => {
         receivedChunks.push(err || chunk)

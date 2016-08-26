@@ -68,6 +68,7 @@ module.exports = function(config) {
 
     // list of files / patterns to load in the browser
     files: [
+      'node_modules/text-encoding/lib/encoding.js',
       'build/integration-tests.js'
     ],
 
@@ -78,6 +79,7 @@ module.exports = function(config) {
 
     proxies: {
       '/chunked-response': 'http://localhost:2001/chunked-response',
+      '/chunked-utf8-response': 'http://localhost:2001/chunked-utf8-response',
       '/split-chunked-response': 'http://localhost:2001/split-chunked-response',
       '/error-response': 'http://localhost:2001/error-response',
       '/echo-response': 'http://localhost:2001/echo-response'

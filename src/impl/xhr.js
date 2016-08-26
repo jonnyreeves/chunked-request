@@ -1,16 +1,19 @@
 export const XHR = 'xhr';
 
 export default function xhrRequest(options) {
+  const textEncoder = new TextEncoder();
   const xhr = new XMLHttpRequest();
   let index = 0;
 
   function onProgressEvent() {
-    const rawChunk = xhr.responseText.substr(index);
+    const rawText = xhr.responseText.substr(index);
     index = xhr.responseText.length;
-    options.onRawChunk(rawChunk);
+    options.onRawChunk(textEncoder.encode(rawText, { stream: true }));
   }
 
   function onLoadEvent() {
+    // Force the textEncoder to flush.
+    options.onRawChunk(textEncoder.encode(null, { stream: false }));
     options.onRawComplete({
       statusCode: xhr.status,
       transport: XHR,

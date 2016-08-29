@@ -1,7 +1,11 @@
-## unreleased
+## [0.5.0] - 29/08/2016
 ### Added
 - Transport exception handling, eg: 'no route to host'. (#8 @Ruben-Hartog)
 - Support for WebWorkers (#11, @ariutta)
+- Changed `chunkParser` interface; parsers now receive data as a `Uint8Array` and now pump their own internal state; the `defaultChunkParser` continues to work as before. (#15, @ariutta)
+
+### Fixed
+- Chrome ReadableStream detection (#14)
 
 ## [0.4.0] - 19/05/2016
 ### Added

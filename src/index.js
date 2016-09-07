@@ -15,55 +15,23 @@ export default function chunkedRequest(options) {
     method = 'GET',
     body,
     credentials = 'same-origin',
-    onComplete = noop,
-    onChunk = noop,
-    chunkParser = defaultChunkParser
+    onData = noop,
+    parser = defaultChunkParser
   } = options;
-
-  // parserState can be utilised by the chunkParser to hold on to state; the
-  // defaultChunkParser uses it to keep track of any trailing text the last
-  // delimiter in the chunk.  There is no contract for parserState.
-  let parserState;
-
-  function processRawChunk(chunkBytes, flush = false) {
-    let parsedChunks = null;
-    let parseError = null;
-
-    try {
-      [ parsedChunks, parserState ] = chunkParser(chunkBytes, parserState, flush);
-    } catch (e) {
-      parseError = e;
-      parseError.chunkBytes = chunkBytes;
-      parseError.parserState = parserState;
-    } finally {
-      if (parseError || (parsedChunks && parsedChunks.length > 0)) {
-        onChunk(parseError, parsedChunks);
-      }
-    }
-  }
-
-  function processRawComplete(rawComplete) {
-    if (parserState) {
-      // Flush the parser to process any remaining state.
-      processRawChunk(new Uint8Array(0), true);
-    }
-    onComplete(rawComplete);
-  }
 
   let transport = options.transport;
   if (!transport) {
     transport = chunkedRequest.transportFactory();
   }
 
-  transport({
+  return transport({
     url,
     headers,
     method,
     body,
-    credentials,
-    onRawChunk: processRawChunk,
-    onRawComplete: processRawComplete
-  });
+    credentials
+  })
+      .then(res => parser(res, onData));
 }
 
 // override this function to delegate to an alternative transport function selection
@@ -77,6 +45,6 @@ function validateOptions(o) {
 
   // Optional.
   if (o.onComplete && typeof o.onComplete !== 'function') throw new Error('Invalid options.onComplete value');
-  if (o.onChunk && typeof o.onChunk !== 'function') throw new Error('Invalid options.onChunk value');
-  if (o.chunkParser && typeof o.chunkParser !== 'function') throw new Error('Invalid options.chunkParser value');
+  if (o.onData && typeof o.onData !== 'function') throw new Error('Invalid options.onData value');
+  if (o.parser && typeof o.parser !== 'function') throw new Error('Invalid options.parser value');
 }

@@ -1,3 +1,8 @@
+## [0.5.1] - 07/09/2016
+### Fixed
+- Fied a bug in the xhr transport where the chunk parser would be invoked
+  with the bytes `[110, 117, 108, 108]` (string value: `"null"`) when using Chrome's native TextEncoder implementation.
+
 ## [0.5.0] - 29/08/2016
 ### Added
 - Transport exception handling, eg: 'no route to host'. (#8 @Ruben-Hartog)

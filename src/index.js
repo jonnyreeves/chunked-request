@@ -1,6 +1,6 @@
 import { isObject, noop } from './util';
 import defaultTransportFactory  from './defaultTransportFactory';
-import defaultChunkParser from './defaultChunkParser';
+import defaultChunkParser from './defaultParser';
 
 // chunkedRequest will make a network request to the URL specified in `options.url`
 // passing chunks of data extracted by the optional `options.chunkParser` to the
@@ -16,6 +16,7 @@ export default function chunkedRequest(options) {
     body,
     credentials = 'same-origin',
     onData = noop,
+    onComplete = noop,
     parser = defaultChunkParser
   } = options;
 
@@ -31,7 +32,8 @@ export default function chunkedRequest(options) {
     body,
     credentials
   })
-      .then(res => parser(res, onData));
+      .then(res => parser(res, onData))
+      .then(res => onComplete({ res }))
 }
 
 // override this function to delegate to an alternative transport function selection

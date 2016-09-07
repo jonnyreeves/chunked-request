@@ -7,14 +7,15 @@ export default function fetchRequest(options) {
   const headers = marshallHeaders(options.headers);
 
   return fetch(options.url, { headers, method, body, credentials })
-    .then(res => ({
-      body: {
-        getReader: res.body.getReader
-      },
-      headers: res.headers,
-      status: res.status,
-      cancel: res.cancel
-    }));
+    .then(res => {
+      return {
+        body: res.body,
+        headers: res.headers,
+        status: res.status,
+        cancel: res.cancel
+      };
+
+    });
 }
 
 function marshallHeaders(v) {

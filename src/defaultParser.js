@@ -2,6 +2,7 @@ const entryDelimiter = '\n';
 
 export default function jsonLiteralParser(res, onData) {
   const textDecoder = new TextDecoder();
+  const reader = res.body.getReader();
   let trailer = '';
 
   function processChunk(bytes, flush = false) {
@@ -24,7 +25,10 @@ export default function jsonLiteralParser(res, onData) {
       const jsonObjects = jsonLiterals
           .filter(v => v.trim() !== '')
           .map(v => JSON.parse(v));
-      onData(jsonObjects);
+
+      if (jsonObjects.length) {
+        onData(null, jsonObjects);
+      }
     }
     catch (err) {
       onData(err);
@@ -33,7 +37,7 @@ export default function jsonLiteralParser(res, onData) {
 
   // call read() recursively until it's exhausted.
   function pump() {
-    return res.body.getReader().read()
+    return reader.read()
         .then(next => {
           if (next.done) {
             processChunk(new Uint8Array(), true);

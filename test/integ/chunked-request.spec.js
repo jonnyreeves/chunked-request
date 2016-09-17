@@ -27,21 +27,6 @@ describe('chunked-request', () => {
     });
   });
 
-  it('should supply a Uint8Array to the chunkParser', done => {
-    let actual = false;
-
-    const onComplete = () => {
-      expect(actual).toBe(true);
-      done();
-    };
-
-    chunkedRequest({
-      url: `/chunked-response?numChunks=1&entriesPerChunk=1&delimitLast=1`,
-      chunkParser: bytes => { actual = (bytes instanceof Uint8Array); },
-      onComplete
-    });
-  });
-
   it('should parse utf8 responses', done => {
     const receivedChunks = [];
 
@@ -140,7 +125,7 @@ describe('chunked-request', () => {
     });
   });
 
-  it('should catch errors raised by the chunkParser and pass them to the `onData` callback', done => {
+  it('should catch errors raised by the parser and pass them to the `onData` callback', done => {
     const receivedChunks = [];
     const onComplete = () => {
       const chunkErrors = receivedChunks.filter(v => v instanceof Error);
@@ -155,7 +140,7 @@ describe('chunked-request', () => {
 
     chunkedRequest({
       url: `/chunked-response?numChunks=1&entriesPerChunk=1&delimitLast=1`,
-      chunkParser: (chunkBytes, state, flush) => {
+      parser: (chunkBytes, state, flush) => {
         if (chunkBytes.length > 0 && !flush) {
           throw new Error("expected");
         }

@@ -69,6 +69,7 @@ module.exports = function(config) {
     // list of files / patterns to load in the browser
     files: [
       'node_modules/text-encoding/lib/encoding.js',
+      'node_modules/web-streams-polyfill/dist/polyfill.js',
       'build/integration-tests.js'
     ],
 

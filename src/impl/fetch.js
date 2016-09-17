@@ -1,7 +1,5 @@
 import { isObject } from '../util';
 
-export const READABLE_BYTE_STREAM = 'readable-byte-stream';
-
 export default function fetchRequest(options) {
   const { method, body, credentials } = options;
   const headers = marshallHeaders(options.headers);
@@ -11,10 +9,11 @@ export default function fetchRequest(options) {
       return {
         body: res.body,
         headers: res.headers,
+        ok: res.ok,
         status: res.status,
-        cancel: res.cancel
+        statusText: res.statusText,
+        url: res.url
       };
-
     });
 }
 

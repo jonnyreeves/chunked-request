@@ -1,19 +1,40 @@
 import fetchRequest from './impl/fetch';
-import mozXhrRequest from './impl/mozXhr';
-import xhrRequest from './impl/xhr';
+import { makeXhrTransport } from './impl/xhr';
 
 let selected = null;
 
 export default function defaultTransportFactory() {
-  const userAgent = navigator.userAgent.toLowerCase();
-
   if (!selected) {
-    if (userAgent.indexOf("chrome") !== -1) {
+    if (window.Response && window.Response.prototype.hasOwnProperty("body")) {
+      console.log("selected fetch with ReadableStream");
       selected = fetchRequest;
-    } else if (userAgent.indexOf('firefox') !== -1) {
-      selected = mozXhrRequest;
     } else {
-      selected = xhrRequest;
+      const tmpXhr = new XMLHttpRequest();
+      const mozChunked = 'moz-chunked-arraybuffer';
+      tmpXhr.responseType = mozChunked;
+      if (tmpXhr.responseType === mozChunked) {
+        console.log("selected moz!");
+        selected = makeXhrTransport({
+          responseType: mozChunked,
+          responseParserFactory: function () {
+            return response => new Uint8Array(response);
+          }
+        });
+      } else {
+        console.log("selected plain xhr");
+        selected = makeXhrTransport({
+          responseType: 'text',
+          responseParserFactory: function () {
+            const encoder = new TextEncoder();
+            let offset = 0;
+            return function (response) {
+              const chunk = response.substr(offset);
+              offset = response.length;
+              return encoder.encode(chunk, { stream: true });
+            }
+          }
+        });
+      }
     }
   }
   return selected;

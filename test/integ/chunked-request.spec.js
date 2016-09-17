@@ -22,22 +22,7 @@ describe('chunked-request', () => {
 
     chunkedRequest({
       url: `/chunked-response?numChunks=1&entriesPerChunk=1&delimitLast=1`,
-      onChunk: (err, chunk) => receivedChunks.push(err || chunk),
-      onComplete
-    });
-  });
-
-  it('should supply a Uint8Array to the chunkParser', done => {
-    let actual = false;
-
-    const onComplete = () => {
-      expect(actual).toBe(true);
-      done();
-    };
-
-    chunkedRequest({
-      url: `/chunked-response?numChunks=1&entriesPerChunk=1&delimitLast=1`,
-      chunkParser: bytes => { actual = (bytes instanceof Uint8Array); },
+      onData: (err, chunk) => receivedChunks.push(err || chunk),
       onComplete
     });
   });
@@ -57,7 +42,7 @@ describe('chunked-request', () => {
 
     chunkedRequest({
       url: `/chunked-utf8-response`,
-      onChunk: (err, chunk) => receivedChunks.push(err || chunk),
+      onData: (err, chunk) => receivedChunks.push(err || chunk),
       onComplete
     });
   });
@@ -81,7 +66,7 @@ describe('chunked-request', () => {
 
     chunkedRequest({
       url: `/chunked-response?numChunks=3&entriesPerChunk=1&delimitLast=1`,
-      onChunk: (err, chunk) => {
+      onData: (err, chunk) => {
         receivedChunks.push(err || chunk)
       },
       onComplete
@@ -107,7 +92,7 @@ describe('chunked-request', () => {
 
     chunkedRequest({
       url: `/chunked-response?numChunks=3&entriesPerChunk=1&delimitLast=0`,
-      onChunk: (err, chunk) => {
+      onData: (err, chunk) => {
         receivedChunks.push(err || chunk)
       },
       onComplete
@@ -133,14 +118,14 @@ describe('chunked-request', () => {
 
     chunkedRequest({
       url: `/split-chunked-response`,
-      onChunk: (err, chunk) => {
+      onData: (err, chunk) => {
         receivedChunks.push(err || chunk)
       },
       onComplete
     });
   });
 
-  it('should catch errors raised by the chunkParser and pass them to the `onChunk` callback', done => {
+  it('should catch errors raised by the parser and pass them to the `onData` callback', done => {
     const receivedChunks = [];
     const onComplete = () => {
       const chunkErrors = receivedChunks.filter(v => v instanceof Error);
@@ -155,13 +140,13 @@ describe('chunked-request', () => {
 
     chunkedRequest({
       url: `/chunked-response?numChunks=1&entriesPerChunk=1&delimitLast=1`,
-      chunkParser: (chunkBytes, state, flush) => {
+      parser: (chunkBytes, state, flush) => {
         if (chunkBytes.length > 0 && !flush) {
           throw new Error("expected");
         }
         return [];
       },
-      onChunk: (err, chunk) => {
+      onData: (err, chunk) => {
         receivedChunks.push(err || chunk)
       },
       onComplete
@@ -203,7 +188,7 @@ describe('chunked-request', () => {
         headers: { 'accept': 'application/json' },
         method: 'POST',
         body: 'expected-body',
-        onChunk: (err, chunk) => receivedChunks.push(err || chunk),
+        onData: (err, chunk) => receivedChunks.push(err || chunk),
         onComplete: () => {
           const chunkErrors = receivedChunks.filter(v => v instanceof Error);
 
@@ -245,7 +230,7 @@ describe('chunked-request', () => {
         chunkedRequest({
           url: `/echo-response`,
           method: 'GET',
-          onChunk: (err, chunk) => receivedChunks.push(err || chunk),
+          onData: (err, chunk) => receivedChunks.push(err || chunk),
           onComplete: () => {
             const chunkErrors = receivedChunks.filter(v => v instanceof Error);
 

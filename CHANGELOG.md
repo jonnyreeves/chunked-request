@@ -1,3 +1,7 @@
+## [0.5.3] - 26/10/2016
+### Fixed
+- Defer onComplete callback to prevent fetch swallowing exceptions (#23 @MarcusLongmuir)
+
 ## [0.5.2] - 07/09/2016
 ### Fixed
 - Fixed a bug where PhantomJS' `Uint8Array` constructor must be invoked with a length argument otherwise it throws an exception...

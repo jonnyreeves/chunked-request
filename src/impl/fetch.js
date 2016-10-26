@@ -10,11 +10,14 @@ export default function fetchRequest(options) {
     return reader.read()
       .then(result => {
         if (result.done) {
-          return onRawComplete({
-            statusCode: res.status,
-            transport: READABLE_BYTE_STREAM,
-            raw: res
+          setTimeout(() => {
+            onRawComplete({
+              statusCode: res.status,
+              transport: READABLE_BYTE_STREAM,
+              raw: res
+            });
           });
+          return;
         }
         onRawChunk(result.value);
         return pump(reader, res);
@@ -22,10 +25,12 @@ export default function fetchRequest(options) {
   }
 
   function onError(err) {
-    options.onRawComplete({
-      statusCode: 0,
-      transport: READABLE_BYTE_STREAM,
-      raw: err
+    setTimeout(() => {
+      options.onRawComplete({
+        statusCode: 0,
+        transport: READABLE_BYTE_STREAM,
+        raw: err
+      });
     });
   }
 

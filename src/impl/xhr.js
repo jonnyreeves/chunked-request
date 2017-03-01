@@ -25,8 +25,7 @@ export default function xhrRequest(options) {
 
   function onStateChange() {
     if(this.readyState == this.HEADERS_RECEIVED) {
-      const browserHeaders = new BrowserHeaders(this.getAllResponseHeaders());
-      options.onRawHeaders(browserHeaders, this.status);
+      options.onRawHeaders(new BrowserHeaders(this.getAllResponseHeaders()), this.status);
     }
   }
 

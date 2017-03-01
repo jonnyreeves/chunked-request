@@ -19,8 +19,7 @@ export default function mozXhrRequest(options) {
 
   function onStateChange() {
     if(this.readyState == this.HEADERS_RECEIVED) {
-      const browserHeaders = new BrowserHeaders(this.getAllResponseHeaders());
-      options.onRawHeaders(browserHeaders, this.status);
+      options.onRawHeaders(new BrowserHeaders(this.getAllResponseHeaders()), this.status);
     }
   }
   function onError(err) {

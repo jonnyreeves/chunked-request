@@ -74,6 +74,14 @@ describe('chunked-request', () => {
   it('should parse a response that consists of two chunks and ends with a delimiter', done => {
     const receivedChunks = [];
 
+    let onHeadersCalled = false;
+    let onChunkCalled = false;
+    const onHeaders = (headers, status) => {
+      expect(onChunkCalled).toBe(false, 'onChunk should not be called before onHeaders');
+      expect(status).toBe(200, 'status 200');
+      onHeadersCalled = true;
+    };
+
     const onComplete = () => {
       const chunkErrors = receivedChunks.filter(v => v instanceof Error);
 
@@ -91,8 +99,11 @@ describe('chunked-request', () => {
     chunkedRequest({
       url: `/chunked-response?numChunks=3&entriesPerChunk=1&delimitLast=1`,
       onChunk: (err, chunk) => {
+        expect(onHeadersCalled).toBe(true, 'onHeaders should be called before the first onChunk');
+        onChunkCalled = true;
         receivedChunks.push(err || chunk)
       },
+      onHeaders,
       onComplete
     });
   });

@@ -38,8 +38,7 @@ export default function fetchRequest(options) {
 
   fetch(options.url, { headers, method, body, credentials })
     .then(res => {
-      const browserHeaders = new BrowserHeaders(res.headers);
-      options.onRawHeaders(browserHeaders, res.status);
+      options.onRawHeaders(new BrowserHeaders(res.headers), res.status);
       return pump(res.body.getReader(), res)
     })
     .catch(onError);

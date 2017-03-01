@@ -85,7 +85,7 @@ A function which implements the following interface:
 (headers, statusCode) => undefined
 ```
 
-A function which will be invoked once when the browser has returned the headers of the response. This function is invoked with two arguments:
+A function which will be invoked once when the browser has returned the headers of the response. This will be invoked *before* the first `onChunk` callback. This function is invoked with two arguments:
 
 * `headers` - An instance of [BrowserHeaders](https://github.com/improbable-eng/js-browser-headers)
 * `statusCode` - HTTP status code returned by the underlying transport

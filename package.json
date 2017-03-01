@@ -43,6 +43,6 @@
     "webpack": "^2.2.1"
   },
   "dependencies": {
-    "browser-headers": "^0.1.2"
+    "browser-headers": "^0.1.3"
   }
 }

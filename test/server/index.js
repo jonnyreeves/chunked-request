@@ -81,6 +81,7 @@ function serveChunkedResponse(req, res) {
 
   res.setHeader('Content-Type', 'text/html; charset=UTF-8');
   res.setHeader('Transfer-Encoding', 'chunked');
+  res.setHeader('My-Header', 'My-Header-Value');
 
   // Start at 1 as we serve the first chunk immediately.
   let i = 1;
@@ -104,7 +105,7 @@ function serveChunkedResponse(req, res) {
 }
 
 function serveErrorResponse(req, res) {
-  res.writeHead(500);
+  res.writeHead(500, {'My-Error-Header': 'My-Error-Header-Value'});
   res.write(JSON.stringify({ error: "internal" }));
   res.end();
 }

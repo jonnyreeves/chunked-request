@@ -10,9 +10,17 @@ describe('chunked-request', () => {
   it('should parse a response that consists of a single chunk', done => {
     const receivedChunks = [];
 
+    let onHeadersCalled = false;
+    const onHeaders = (headers, status) => {
+      expect(status).toBe(200, 'status 200');
+      expect(isEqual(headers.get("my-header"), ["My-Header-Value"])).toBe(true, 'received headers');
+      onHeadersCalled = true;
+    };
+
     const onComplete = () => {
       const chunkErrors = receivedChunks.filter(v => v instanceof Error);
 
+      expect(onHeadersCalled).toBe(true);
       expect(receivedChunks.length).toBe(1, 'receivedChunks');
       expect(chunkErrors.length).toBe(0, 'of which errors');
       expect(isEqual(receivedChunks, [ [ {chunk: '#1', data: '#0'} ] ])).toBe(true, 'parsed chunks');
@@ -23,7 +31,8 @@ describe('chunked-request', () => {
     chunkedRequest({
       url: `/chunked-response?numChunks=1&entriesPerChunk=1&delimitLast=1`,
       onChunk: (err, chunk) => receivedChunks.push(err || chunk),
-      onComplete
+      onHeaders,
+      onComplete,
     });
   });
 
@@ -183,15 +192,24 @@ describe('chunked-request', () => {
     });
 
     it('500 Internal Server Error', done => {
+      let onHeadersCalled = false;
+      const onHeaders = (headers, status) => {
+        expect(status).toBe(500, 'status 500');
+        expect(isEqual(headers.get("my-error-header"), ["My-Error-Header-Value"])).toBe(true, 'received headers');
+        onHeadersCalled = true;
+      };
+      const onComplete = result => {
+        expect(onHeadersCalled).toBe(true);
+        expect(isObject(result)).toBe(true, 'is an object');
+        expect(result.statusCode).toBe(500, 'statusCode');
+        expect(isObject(result.raw)).toBe(true, 'raw transport agent provided');
+
+        done();
+      };
       chunkedRequest({
         url: `/error-response`,
-        onComplete: result => {
-          expect(isObject(result)).toBe(true, 'is an object');
-          expect(result.statusCode).toBe(500, 'statusCode');
-          expect(isObject(result.raw)).toBe(true, 'raw transport agent provided');
-
-          done();
-        }
+        onHeaders,
+        onComplete,
       })
     });
 

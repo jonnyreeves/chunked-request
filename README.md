@@ -34,6 +34,7 @@ chunkedRequest({
   credentials: 'include',
   chunkParser(rawChunk) { /*...*/ },
   onChunk(err, parsedChunk) { /*...*/ },
+  onHeaders(headers, status) { /*...*/ }
   onComplete(result) { /*...*/ }
 });
 ```
@@ -74,6 +75,19 @@ A function which implements the following interface:
 ```
 
 The `onChunk` handler will be invoked each time a chunk of data it returned by the server. This function will be invoked one or more times depending on the response.  The function is invoked with two arguments; the first is an optional error which will be null unless there was a parsing error thrown by the `chunkParser``.  The second argument is an optional parsedChunk value which is produced by the supplied `chunkParser` (see: `options.chunkParser`).
+
+#### onHeaders (optional)
+A function which implements the following interface:
+
+```js
+(headers, statusCode) => undefined
+```
+
+A function which will be invoked once when the browser has returned the headers of the response. This function is invoked with two arguments:
+
+* `headers` - An instance of [BrowserHeaders](https://github.com/improbable-eng/js-browser-headers)
+* `statusCode` - HTTP status code returned by the underlying transport
+
 
 #### onComplete (optional)
 A function which implements the following interface:

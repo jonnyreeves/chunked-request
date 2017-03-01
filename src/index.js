@@ -4,8 +4,10 @@ import defaultChunkParser from './defaultChunkParser';
 
 // chunkedRequest will make a network request to the URL specified in `options.url`
 // passing chunks of data extracted by the optional `options.chunkParser` to the
-// optional `options.onChunk` callback.  When the request has completed the optional
-// `options.onComplete` callback will be invoked.
+// optional `options.onChunk` callback. When the headers of the response are received
+// the optional `options.onHeaders` callback will be invoked with the headers as an
+// instance of BrowserHeaders and the numeric status code. When the request has
+// completed the optional `options.onComplete` callback will be invoked.
 export default function chunkedRequest(options) {
   validateOptions(options);
 
@@ -15,6 +17,7 @@ export default function chunkedRequest(options) {
     method = 'GET',
     body,
     credentials = 'same-origin',
+    onHeaders = noop,
     onComplete = noop,
     onChunk = noop,
     chunkParser = defaultChunkParser
@@ -24,6 +27,10 @@ export default function chunkedRequest(options) {
   // defaultChunkParser uses it to keep track of any trailing text the last
   // delimiter in the chunk.  There is no contract for parserState.
   let parserState;
+
+  function processRawHeaders(headers, status) {
+    onHeaders(headers, status);
+  }
 
   function processRawChunk(chunkBytes, flush = false) {
     let parsedChunks = null;
@@ -61,6 +68,7 @@ export default function chunkedRequest(options) {
     method,
     body,
     credentials,
+    onRawHeaders: processRawHeaders,
     onRawChunk: processRawChunk,
     onRawComplete: processRawComplete
   });
@@ -77,6 +85,7 @@ function validateOptions(o) {
 
   // Optional.
   if (o.onComplete && typeof o.onComplete !== 'function') throw new Error('Invalid options.onComplete value');
+  if (o.onHeaders && typeof o.onHeaders !== 'function') throw new Error('Invalid options.onHeaders value');
   if (o.onChunk && typeof o.onChunk !== 'function') throw new Error('Invalid options.onChunk value');
   if (o.chunkParser && typeof o.chunkParser !== 'function') throw new Error('Invalid options.chunkParser value');
 }

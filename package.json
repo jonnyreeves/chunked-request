@@ -16,7 +16,7 @@
   "scripts": {
     "prepublish": "npm run clean && npm run build:lib",
     "clean": "rm -rf build/*",
-    "build:integ": "mkdir -p build && browserify test/integ/*.spec.js -o build/integration-tests.js --debug -t [ babelify ]",
+    "build:integ": "webpack",
     "build:lib": "mkdir -p lib && babel --out-dir lib src",
     "lint": "eslint .",
     "test": "npm run lint && npm run test:integ",
@@ -24,21 +24,25 @@
     "release": "./release.sh ${npm_package_version}"
   },
   "devDependencies": {
-    "babel-cli": "^6.11.4",
+    "babel-core": "^6.23.1",
+    "babel-loader": "^6.3.2",
     "babel-preset-es2015": "^6.13.2",
     "babelify": "^7.3.0",
     "browserify": "^13.1.0",
     "cookie": "^0.3.1",
     "eslint": "^3.3.1",
-    "jasmine": "^2.4.1",
     "jasmine-core": "^2.4.1",
     "karma": "^1.2.0",
     "karma-chrome-launcher": "^1.0.1",
     "karma-jasmine": "^1.0.2",
     "karma-sauce-launcher": "^1.0.0",
+    "karma-sourcemap-loader": "^0.3.7",
     "lodash": "^4.15.0",
     "text-encoding": "^0.6.0",
-    "url": "^0.11.0"
+    "url": "^0.11.0",
+    "webpack": "^2.2.1"
   },
-  "dependencies": {}
+  "dependencies": {
+    "browser-headers": "^0.1.2"
+  }
 }

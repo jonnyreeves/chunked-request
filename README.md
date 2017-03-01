@@ -1,6 +1,8 @@
 # chunked-request
 > Compatibility layer for efficient streaming of chunked-transfer encoded responses
 
+## Somewhat deprecated in favor of [jonnyreeves/fetch-readablestream](https://github.com/jonnyreeves/fetch-readablestream/)
+
 You can leverage [chunked-transfer](https://en.wikipedia.org/wiki/Chunked_transfer_encoding) encoded responses on your service tier to provide partial responses to the client before the entire response has been sent.
 
 At the time of writing (August 2016) there is fragmented support for efficient chunked transfer encoding in Javascript with `moz-chunked-text` provided only in Firefox and `ReadableStream` support only present in Chrome.  Other browsers need to fall-back to substring'ing the `responseText` property when the XHR's readyState event is fired.

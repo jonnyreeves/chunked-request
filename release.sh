@@ -26,7 +26,7 @@ then
     echo 'module.exports = require("./index").default;' > ./lib/entry.js
 
     mkdir -p dist
-    ./node_modules/.bin/browserify -s chunkedRequest -e ./lib/entry.js -o dist/chunked-request.js
+    ./node_modules/.bin/webpack --output-library chunkedRequest --output-library-target umd --entry ./lib/entry.js --output-path dist --output-filename chunked-request.js
 
     echo "Creating Github release branch release/v${VERSION}"
     git checkout -b release/v${VERSION}

@@ -1,3 +1,7 @@
+## [0.6.0] - 02/03/2017
+### Added
+- `onHeaders` callback (#25 @MarcusLongmuir)
+
 ## [0.5.3] - 26/10/2016
 ### Fixed
 - Defer onComplete callback to prevent fetch swallowing exceptions (#23 @MarcusLongmuir)

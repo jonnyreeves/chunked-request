@@ -1,3 +1,5 @@
+import BrowserHeaders from 'browser-headers';
+
 import { isObject } from '../util';
 
 export const READABLE_BYTE_STREAM = 'readable-byte-stream';
@@ -35,7 +37,10 @@ export default function fetchRequest(options) {
   }
 
   fetch(options.url, { headers, method, body, credentials })
-    .then(res => pump(res.body.getReader(), res))
+    .then(res => {
+      options.onRawHeaders(new BrowserHeaders(res.headers), res.status);
+      return pump(res.body.getReader(), res)
+    })
     .catch(onError);
 }
 

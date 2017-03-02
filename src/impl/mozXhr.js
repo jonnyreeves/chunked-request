@@ -1,3 +1,5 @@
+import BrowserHeaders from 'browser-headers';
+
 export const MOZ_CHUNKED = 'moz-chunked';
 
 export default function mozXhrRequest(options) {
@@ -15,6 +17,11 @@ export default function mozXhrRequest(options) {
     });
   }
 
+  function onStateChange() {
+    if(this.readyState == this.HEADERS_RECEIVED) {
+      options.onRawHeaders(new BrowserHeaders(this.getAllResponseHeaders()), this.status);
+    }
+  }
   function onError(err) {
     options.onRawComplete({
       statusCode: 0,
@@ -33,6 +40,7 @@ export default function mozXhrRequest(options) {
   if (options.credentials === 'include') {
     xhr.withCredentials = true;
   }
+  xhr.addEventListener('readystatechange', onStateChange);
   xhr.addEventListener('progress', onProgressEvent);
   xhr.addEventListener('loadend', onLoadEvent);
   xhr.addEventListener('error', onError);

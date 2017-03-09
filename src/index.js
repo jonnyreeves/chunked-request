@@ -1,6 +1,7 @@
 import { isObject, noop } from './util';
 import defaultTransportFactory  from './defaultTransportFactory';
 import defaultChunkParser from './defaultChunkParser';
+import { BrowserHeaders } from 'browser-headers';
 
 // chunkedRequest will make a network request to the URL specified in `options.url`
 // passing chunks of data extracted by the optional `options.chunkParser` to the
@@ -64,7 +65,7 @@ export default function chunkedRequest(options) {
 
   transport({
     url,
-    headers,
+    headers: new BrowserHeaders(headers || {}),
     method,
     body,
     credentials,

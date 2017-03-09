@@ -118,6 +118,7 @@ module.exports = function(config) {
 
     browsers: browsers,
     captureTimeout: 120000,
+    browserNoActivityTimeout: 60000,
     customLaunchers: customLaunchers,
 
     // Continuous Integration mode

@@ -48,7 +48,12 @@ The URL to make the request against as a string
 The HTTP method to use when making the request.
 
 #### headers (optional)
-A hash of HTTP headers to sent with the request.
+HTTP headers to sent with the request in the form of one of:
+* An instance of [BrowserHeaders](https://github.com/improbable-eng/js-browser-headers)
+* An instance of `Headers`
+* An object consisting of `string: (string|string[])` (e.g. `{"key-a":["one","two"],"key-b":"three"}`) 
+* A `Map<string, string|string[]>`
+* A CLRF-delimited string (e.g. `key-a: one\r\nkey-b: two`)
 
 #### body (optional)
 The value to send along with the request.
@@ -116,6 +121,8 @@ A function which implements the following interface:
 The underlying function used to make the request, see the provided implementations if you wish to provide a custom extension.  Note that you must supply a Uint8Array to the `onRawChunk` callback.
 
 If no value is supplied the `chunkedRequest.transportFactory` function will be invoked to determine which transport method to use.  The default `transportFactory` will attempt to select the best available method for the current platform; but you can override this method for substituting a test-double or custom implementation.
+
+The `headers` property is an instance of [BrowserHeaders](https://github.com/improbable-eng/js-browser-headers).
 
 
 ## Writing a Custom Chunk Parser

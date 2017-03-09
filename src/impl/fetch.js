@@ -1,12 +1,10 @@
-import BrowserHeaders from 'browser-headers';
-
-import { isObject } from '../util';
+import { BrowserHeaders } from 'browser-headers';
 
 export const READABLE_BYTE_STREAM = 'readable-byte-stream';
 
 export default function fetchRequest(options) {
   const { onRawChunk, onRawComplete, method, body, credentials } = options;
-  const headers = marshallHeaders(options.headers);
+  const headers = options.headers.toHeaders();
 
   function pump(reader, res) {
     return reader.read()
@@ -42,12 +40,4 @@ export default function fetchRequest(options) {
       return pump(res.body.getReader(), res)
     })
     .catch(onError);
-}
-
-function marshallHeaders(v) {
-  if (v instanceof Headers) {
-    return v;
-  } else if (isObject(v)) {
-    return new Headers(v);
-  }
 }

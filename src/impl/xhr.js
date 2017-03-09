@@ -1,4 +1,4 @@
-import BrowserHeaders from 'browser-headers';
+import { BrowserHeaders } from 'browser-headers';
 
 export const XHR = 'xhr';
 
@@ -39,11 +39,9 @@ export default function xhrRequest(options) {
 
   xhr.open(options.method, options.url);
   xhr.responseType = 'text';
-  if (options.headers) {
-    Object.getOwnPropertyNames(options.headers).forEach(k => {
-      xhr.setRequestHeader(k, options.headers[k]);
-    })
-  }
+  options.headers.forEach((key, values) => {
+    xhr.setRequestHeader(key, values.join(", "));
+  });
   if (options.credentials === 'include') {
     xhr.withCredentials = true;
   }

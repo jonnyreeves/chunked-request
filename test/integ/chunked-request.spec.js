@@ -1,6 +1,7 @@
 import chunkedRequest from '../../src/index';
 import isEqual from 'lodash/isEqual';
 import isObject from 'lodash/isObject';
+import { BrowserHeaders } from 'browser-headers';
 
 // These integration tests run through Karma; check `karma.conf.js` for
 // configuration.  Note that the dev-server which provides the `/chunked-response`
@@ -247,6 +248,59 @@ describe('chunked-request', () => {
 
           done();
         }
+      });
+    });
+
+
+    describe('headers support', () => {
+      const browserHeaders = new BrowserHeaders();
+      browserHeaders.append("accept", "application/json");
+      browserHeaders.append("myheader", "my-value");
+
+      const headerFormats = [
+        [{'accept': 'application/json', 'myheader': 'my-value'}, "object"],
+        [{'accept': ['application/json'], 'myheader': ['my-value']}, "object"],
+        ['accept: application/json\r\nmyheader: my-value', "clrf string"],
+        [browserHeaders, "BrowserHeaders"],
+      ];
+
+      if (typeof Headers !== "undefined") {
+        const headers = new Headers();
+        headers.append("accept", "application/json");
+        headers.append("myheader", "my-value");
+        headerFormats.push([headers, "Headers"]);
+      }
+
+      if (typeof Map !== "undefined") {
+        const headerMap = new Map();// eslint-disable-line no-undef
+        headerMap.set("accept", "application/json");
+        headerMap.set("myheader", ["my-value"]);
+        headerFormats.push([headerMap, "Map"]);
+      }
+
+      headerFormats.forEach(testCase => {
+        const headers = testCase[0];
+        const testName = testCase[1];
+
+        it('should accept headers in various formats (' + testName + ')', done => {
+          const receivedChunks = [];
+          chunkedRequest({
+            url: `/echo-response`,
+            headers: headers,
+            method: 'POST',
+            body: 'expected-body',
+            onChunk: (err, chunk) => receivedChunks.push(err || chunk),
+            onComplete: () => {
+              const {headers, method, body} = receivedChunks[0][0];
+              expect(isObject(headers)).toBe(true, testName + ': has headers');
+              expect(headers.accept).toBe("application/json", testName + ': accept header');
+              expect(headers.myheader).toBe("my-value", testName + ': myheader header');
+              expect(method).toBe("POST", testName + ': method');
+              expect(body).toBe('expected-body', testName + ': body');
+              done();
+            }
+          });
+        });
       });
     });
 

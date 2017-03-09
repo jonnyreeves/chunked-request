@@ -65,7 +65,7 @@ export default function chunkedRequest(options) {
 
   transport({
     url,
-    headers: new BrowserHeaders(headers ? headers : {}),
+    headers: new BrowserHeaders(headers || {}),
     method,
     body,
     credentials,

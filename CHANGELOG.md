@@ -1,3 +1,7 @@
+## [0.7.0] - 10/03/2017
+### Added
+- Allow request headers to be supplied in any format supported by [BrowserHeaders](https://github.com/improbable-eng/js-browser-headers) (#26 @MarcusLongmuir)
+
 ## [0.6.0] - 02/03/2017
 ### Added
 - `onHeaders` callback (#25 @MarcusLongmuir)

@@ -1,3 +1,7 @@
+## [0.7.1] - 15/03/2017
+### Fixed
+- Upgrade [BrowserHeaders](https://github.com/improbable-eng/js-browser-headers) dependency (#27 @MarcusLongmuir)
+
 ## [0.7.0] - 10/03/2017
 ### Added
 - Allow request headers to be supplied in any format supported by [BrowserHeaders](https://github.com/improbable-eng/js-browser-headers) (#26 @MarcusLongmuir)
